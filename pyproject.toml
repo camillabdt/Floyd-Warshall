@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "floyd-warshall-solid"
+version = "1.0.0"
+description = "Implementação própria do Floyd-Warshall com SOLID, NetworkX e Poetry."
+authors = ["Equipe Floyd-Warshall"]
+readme = "README.md"
+packages = [{ include = "floyd_warshall", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+networkx = "^3.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+
+[tool.poetry.scripts]
+floyd-warshall = "floyd_warshall.presentation.cli:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

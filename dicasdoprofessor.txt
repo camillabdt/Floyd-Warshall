@@ -1,0 +1,10 @@
+dicas gerais para o seminário
+
+Funcionalidades esperadas 
+1. gerenciamento de datasets
+2. Avaliação com múltipla métricas
+3. visualização de resultados 
+4. Exportação de relatórios
+5. Bônus: 
+- Comparação com algoritmos baseline
+- Análise de complexidade

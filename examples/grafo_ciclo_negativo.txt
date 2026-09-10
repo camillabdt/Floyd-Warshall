@@ -1,0 +1,5 @@
+# Ciclo A -> B -> C -> A; peso total = -1
+VERTICES A B C
+A B 1
+B C -3
+C A 1

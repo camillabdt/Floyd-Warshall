@@ -1,0 +1,5 @@
+# Peso negativo sem ciclo negativo
+VERTICES A B C
+A B 4
+A C 5
+B C -2
