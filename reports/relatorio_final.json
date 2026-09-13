@@ -1,6 +1,7 @@
 {
   "dataset": "grafo_exemplo.csv",
   "algorithm": "Floyd-Warshall próprio",
+  "algorithm_rationale": "Floyd-Warshall foi escolhido por calcular todos os pares, permitir matrizes e consultas reutilizáveis e oferecer uma implementação didática com pesos negativos. É adequado à escala demonstrada, mas não é universalmente superior: tempo O(V³) e espaço O(V²) limitam redes grandes. Para poucas origens e pesos não negativos, Dijkstra pode ser mais adequado; para todos os pares em redes esparsas, Johnson merece avaliação. As redes maiores deste projeto são esparsas e positivas. A concordância com Bellman-Ford apoia a correção dos casos testados, mas medições pontuais não demonstram superioridade geral, e Dijkstra e Johnson não foram medidos.",
   "vertices": [
     "A",
     "B",
@@ -33,7 +34,7 @@
     "vertices": 4,
     "edges": 4,
     "density": 33.33333333333333,
-    "execution_time_ms": 0.06697799835819751,
+    "execution_time_ms": 0.024654000299051404,
     "peak_memory_kb": 1.6328125,
     "reachable_pairs": 6,
     "unreachable_pairs": 6,
@@ -47,8 +48,8 @@
       "vertices": 4,
       "edges": 4,
       "density": 33.33333333333333,
-      "execution_time_ms": 0.02160000440198928,
-      "peak_memory_kb": 1.6015625,
+      "execution_time_ms": 0.014107994502410293,
+      "peak_memory_kb": 1.609375,
       "reachable_pairs": 6,
       "unreachable_pairs": 6,
       "average_distance": 3.3333333333333335,
@@ -59,8 +60,8 @@
       "vertices": 4,
       "edges": 4,
       "density": 33.33333333333333,
-      "execution_time_ms": 0.7378399968729354,
-      "peak_memory_kb": 4.6015625,
+      "execution_time_ms": 0.2664460043888539,
+      "peak_memory_kb": 5.109375,
       "reachable_pairs": 6,
       "unreachable_pairs": 6,
       "average_distance": 3.3333333333333335,
@@ -207,5 +208,89 @@
       ]
     }
   ],
-  "algorithm_rationale": "Floyd-Warshall foi escolhido por calcular todos os pares, permitir matrizes e consultas reutilizáveis e oferecer uma implementação didática com pesos negativos. É adequado à escala demonstrada, mas não é universalmente superior: tempo O(V³) e espaço O(V²) limitam redes grandes. Para poucas origens e pesos não negativos, Dijkstra pode ser mais adequado; para todos os pares em redes esparsas, Johnson merece avaliação. As redes maiores deste projeto são esparsas e positivas. A concordância com Bellman-Ford apoia a correção dos casos testados, mas medições pontuais não demonstram superioridade geral, e Dijkstra e Johnson não foram medidos."
+  "complexity": [
+    {
+      "vertices": 10,
+      "edges": 90,
+      "median_ms": 0.11139799607917666,
+      "ms_per_n3": 0.00011139799607917666,
+      "repeats": 3
+    },
+    {
+      "vertices": 20,
+      "edges": 380,
+      "median_ms": 0.6584000075235963,
+      "ms_per_n3": 8.230000094044954e-05,
+      "repeats": 3
+    },
+    {
+      "vertices": 40,
+      "edges": 1560,
+      "median_ms": 4.643720007152297,
+      "ms_per_n3": 7.255812511175463e-05,
+      "repeats": 3
+    },
+    {
+      "vertices": 80,
+      "edges": 6320,
+      "median_ms": 34.994929999811575,
+      "ms_per_n3": 6.834947265588198e-05,
+      "repeats": 3
+    }
+  ],
+  "networks": [
+    {
+      "vertices": 40,
+      "edges": 97,
+      "reachable_pairs": 756,
+      "unreachable_pairs": 804,
+      "dataset": "rede_desconexa_40.json",
+      "execution_time_ms": 1.6603890035185032,
+      "baseline_time_ms": 4.728976004116703,
+      "distances_match": true
+    },
+    {
+      "vertices": 30,
+      "edges": 106,
+      "reachable_pairs": 870,
+      "unreachable_pairs": 0,
+      "dataset": "rede_logistica_30.json",
+      "execution_time_ms": 1.6858040035003796,
+      "baseline_time_ms": 5.419229004473891,
+      "distances_match": true
+    },
+    {
+      "vertices": 100,
+      "edges": 430,
+      "reachable_pairs": 9900,
+      "unreachable_pairs": 0,
+      "dataset": "rede_regional_100.json",
+      "execution_time_ms": 108.54091600049287,
+      "baseline_time_ms": 110.03020699718036,
+      "distances_match": true
+    },
+    {
+      "vertices": 60,
+      "edges": 280,
+      "reachable_pairs": 3540,
+      "unreachable_pairs": 0,
+      "dataset": "rede_urbana_60.json",
+      "execution_time_ms": 15.446962999703828,
+      "baseline_time_ms": 25.20721700420836,
+      "distances_match": true
+    }
+  ],
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "packages": {
+      "networkx": "3.6.1",
+      "streamlit": "1.63.0",
+      "plotly": "7.0.0",
+      "pandas": "3.0.5",
+      "pytest": "9.1.1",
+      "python-dotenv": "1.2.3"
+    }
+  },
+  "generated_at": "2026-09-13"
 }
