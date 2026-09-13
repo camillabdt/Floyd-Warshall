@@ -5,7 +5,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 from floyd_warshall.application.floyd_warshall_solver import FloydWarshallSolver, NegativeCycleError
 from floyd_warshall.application.evaluation import EvaluationService
-from floyd_warshall.application.comparison import compare, benchmark
+from floyd_warshall.application.comparison import compare, benchmark, scaling_columns
 from floyd_warshall.infrastructure.bellman_ford_solver import BellmanFordSolver
 from floyd_warshall.infrastructure.networkx_graph import NetworkXGraph
 from floyd_warshall.infrastructure.report_exporter import ReportExporter
@@ -74,6 +74,20 @@ def test_benchmark():
     rows = benchmark(NetworkXGraph, FloydWarshallSolver(), sizes=(3, 6), repeats=2)
     assert [r["edges"] for r in rows] == [6, 30]
     assert all(r["median_ms"] > 0 for r in rows)
+    assert rows[0]["time_ratio"] is None and rows[0]["loglog_slope"] is None
+    assert rows[1]["time_ratio"] == rows[1]["median_ms"] / rows[0]["median_ms"]
+
+
+def test_scaling_columns_recover_cubic_exponent():
+    rows = scaling_columns(
+        [
+            {"vertices": 10, "median_ms": 1.0},
+            {"vertices": 20, "median_ms": 8.0},
+            {"vertices": 40, "median_ms": 64.0},
+        ]
+    )
+    assert [r["time_ratio"] for r in rows] == [None, 8.0, 8.0]
+    assert all(abs(r["loglog_slope"] - 3) < 1e-12 for r in rows[1:])
 
 
 def test_app_flow_and_dataset_change():

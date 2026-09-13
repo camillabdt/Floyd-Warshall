@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from math import isclose
+from math import isclose, log
 from statistics import median
 from time import perf_counter
 from floyd_warshall.application.evaluation import EvaluationService
@@ -21,7 +21,25 @@ def compare(graph, primary, baseline):
     }
 
 
-def benchmark(graph_factory, solver, sizes=(10, 20, 40, 80), repeats=3):
+def scaling_columns(rows):
+    """Compara cada linha com a anterior: razão de tempo e expoente log-log.
+
+    Para tempo ~ c·V^k, a razão entre tamanhos dobrados tende a 2^k e a
+    inclinação log(t2/t1)/log(n2/n1) tende a k. Ambas ficam None na primeira linha.
+    """
+    previous = None
+    for row in rows:
+        row["time_ratio"] = row["loglog_slope"] = None
+        if previous and previous["median_ms"] > 0:
+            row["time_ratio"] = row["median_ms"] / previous["median_ms"]
+            row["loglog_slope"] = log(row["time_ratio"]) / log(
+                row["vertices"] / previous["vertices"]
+            )
+        previous = row
+    return rows
+
+
+def benchmark(graph_factory, solver, sizes=(10, 20, 40, 80, 160, 320), repeats=3):
     """Grafos dirigidos completos determinísticos; mediana sem tracemalloc."""
     rows = []
     for n in sizes:
@@ -48,4 +66,4 @@ def benchmark(graph_factory, solver, sizes=(10, 20, 40, 80), repeats=3):
                 "repeats": repeats,
             }
         )
-    return rows
+    return scaling_columns(rows)

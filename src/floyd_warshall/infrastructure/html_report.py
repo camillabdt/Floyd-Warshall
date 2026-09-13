@@ -302,27 +302,38 @@ def section_verification(data):
 def section_complexity(data):
     rows = data.get("complexity")
     if not rows:
-        body = '<div class="callout">Experimento de escala não incluído nesta exportação. Na aplicação, a aba <strong>Complexidade</strong> executa o experimento com grafos completos de 10 a 80 vértices.</div>'
+        body = '<div class="callout">Experimento de escala não incluído nesta exportação. Na aplicação, a aba <strong>Complexidade</strong> executa o experimento com grafos completos de 10 a 320 vértices.</div>'
     else:
         first = rows[0]
         ratio = rows[-1]["median_ms"] / first["median_ms"] if first["median_ms"] else 0
         growth = (rows[-1]["vertices"] / first["vertices"]) ** 3
+        last = rows[-1]
         body = table(
-            ["Vértices", "Arestas", "Mediana (ms)", "ms / V³ (×10⁻⁴)", "Repetições"],
+            [
+                "Vértices",
+                "Arestas",
+                "Mediana (ms)",
+                "ms / V³ (×10⁻⁴)",
+                "Razão com V anterior",
+                "Inclinação log-log",
+                "Repetições",
+            ],
             [
                 [
                     r["vertices"],
                     r["edges"],
                     fmt(r["median_ms"], 3),
                     fmt(r["ms_per_n3"] * 1e4, 3),
+                    fmt(r.get("time_ratio"), 2),
+                    fmt(r.get("loglog_slope"), 2),
                     r["repeats"],
                 ]
                 for r in rows
             ],
             "num",
         )
-        body += f"""<div class="callout">De {first["vertices"]} para {rows[-1]["vertices"]} vértices, V³ cresce {fmt(growth, 0)} vezes e o tempo medido cresceu <strong>{fmt(ratio, 0)} vezes</strong>. O crescimento fica abaixo de V³, e a coluna ms / V³ diminui com o tamanho: há um custo fixo por execução que pesa mais nos grafos pequenos. Isso é compatível com O(V³) como limite superior.</div>
-<p class="note">Grafos dirigidos completos, gerados de forma determinística, com aquecimento e mediana de {first["repeats"]} execuções sem instrumentação de memória. Quatro tamanhos ilustram a tendência, mas não provam a lei assintótica: o limite O(V³) é fundamentado na análise dos laços da seção 02. A variação de ms / V³ reflete overhead fixo, cache e ambiente.</p>"""
+        body += f"""<div class="callout">De {first["vertices"]} para {last["vertices"]} vértices, V³ cresce {fmt(growth, 0)} vezes e o tempo medido cresceu <strong>{fmt(ratio, 0)} vezes</strong>. Se o tempo fosse exatamente c·V³, dobrar V multiplicaria o tempo por 8 e a inclinação log-log seria 3. Nos tamanhos pequenos a razão fica abaixo de 8 porque um custo fixo por execução pesa mais; conforme V cresce, a razão medida entre {rows[-2]["vertices"]} e {last["vertices"]} vértices foi <strong>{fmt(last.get("time_ratio"), 2)}</strong> e a inclinação <strong>{fmt(last.get("loglog_slope"), 2)}</strong>. Isso é compatível com O(V³).</div>
+<p class="note">Grafos dirigidos completos, gerados de forma determinística, com aquecimento e mediana de {first["repeats"]} execuções sem instrumentação de memória. A razão compara a mediana com a da linha anterior; a inclinação é log(t₂/t₁) / log(V₂/V₁), o expoente k de uma lei tempo ≈ c·V^k entre linhas vizinhas. Medições em {len(rows)} tamanhos verificam a implementação, mas não provam a lei assintótica: o limite O(V³) é fundamentado na contagem dos três laços aninhados da seção 02.</p>"""
     return f"""<section>{heading("complexidade")}
 <p>Tempo <strong>O(V³)</strong>: para cada um dos V intermediários, todos os V² pares são examinados. Espaço <strong>O(V²)</strong>: duas matrizes V × V, uma de distâncias e uma de próximos vértices. O baseline Bellman-Ford custa O(V · E) por origem, logo O(V² · E) para todas as origens; em grafos densos, com E próximo de V², esse limite chega a O(V⁴).</p>{body}</section>"""
 

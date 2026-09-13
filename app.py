@@ -204,7 +204,7 @@ def _render_complexity_tab():
         "**Floyd-Warshall:** tempo O(V³), espaço O(V²). A recorrência é d[i,j] = min(d[i,j], d[i,k] + d[k,j]). A ordem externa de k é essencial.\n\n**Bellman-Ford para todas as origens:** O(V²E), com O(V²) para armazenar o resultado completo."
     )
     st.write(
-        "Experimento: grafos completos de 10, 20, 40 e 80 vértices; pesos positivos determinísticos, aquecimento e mediana de três execuções. O experimento ilustra crescimento, sem provar a complexidade."
+        "Experimento: grafos completos de 10 a 320 vértices, dobrando a cada passo; pesos positivos determinísticos, aquecimento e mediana de três execuções. Se o tempo fosse c·V³, cada dobra multiplicaria o tempo por 8 e a inclinação log-log seria 3. O experimento verifica a implementação, sem provar a complexidade."
     )
     if st.button("Executar experimento de complexidade"):
         st.session_state.benchmark = benchmark(NetworkXGraph, FloydWarshallSolver())
