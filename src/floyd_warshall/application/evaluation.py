@@ -57,31 +57,24 @@ class EvaluationService:
             list(graph.edges())
         )
 
-        # Mede memória usada durante a execução.
-        tracemalloc.start()
-
+        # Tempo sem instrumentação; memória em uma segunda execução.
         start = perf_counter()
-
-        result = self.solver.solve(
-            graph
-        )
-
-        end = perf_counter()
-
-        _, peak_memory = (
-            tracemalloc.get_traced_memory()
-        )
-
-        tracemalloc.stop()
-
-        execution_time_ms = (
-            (end - start) * 1000
-        )
+        result = self.solver.solve(graph)
+        execution_time_ms = (perf_counter() - start) * 1000
+        owns_trace = not tracemalloc.is_tracing()
+        if owns_trace:
+            tracemalloc.start()
+        try:
+            self.solver.solve(graph)
+            _, peak_memory = tracemalloc.get_traced_memory()
+        finally:
+            if owns_trace:
+                tracemalloc.stop()
 
         # Densidade de grafo dirigido.
         if number_of_vertices > 1:
             density = (
-                number_of_edges
+                sum(u != v for u, v, _ in graph.edges())
                 / (
                     number_of_vertices
                     * (

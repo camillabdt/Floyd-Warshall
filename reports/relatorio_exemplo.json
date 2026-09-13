@@ -1,0 +1,211 @@
+{
+  "dataset": "grafo_exemplo.csv",
+  "algorithm": "Floyd-Warshall próprio",
+  "vertices": [
+    "A",
+    "B",
+    "D",
+    "C"
+  ],
+  "edges": [
+    [
+      "A",
+      "B",
+      3.0
+    ],
+    [
+      "A",
+      "D",
+      10.0
+    ],
+    [
+      "B",
+      "C",
+      2.0
+    ],
+    [
+      "C",
+      "D",
+      1.0
+    ]
+  ],
+  "metrics": {
+    "vertices": 4,
+    "edges": 4,
+    "density": 33.33333333333333,
+    "execution_time_ms": 0.06697799835819751,
+    "peak_memory_kb": 1.6328125,
+    "reachable_pairs": 6,
+    "unreachable_pairs": 6,
+    "average_distance": 3.3333333333333335,
+    "minimum_distance": 1.0,
+    "maximum_distance": 6.0
+  },
+  "comparison": {
+    "distances_match": true,
+    "floyd_warshall": {
+      "vertices": 4,
+      "edges": 4,
+      "density": 33.33333333333333,
+      "execution_time_ms": 0.02160000440198928,
+      "peak_memory_kb": 1.6015625,
+      "reachable_pairs": 6,
+      "unreachable_pairs": 6,
+      "average_distance": 3.3333333333333335,
+      "minimum_distance": 1.0,
+      "maximum_distance": 6.0
+    },
+    "bellman_ford": {
+      "vertices": 4,
+      "edges": 4,
+      "density": 33.33333333333333,
+      "execution_time_ms": 0.7378399968729354,
+      "peak_memory_kb": 4.6015625,
+      "reachable_pairs": 6,
+      "unreachable_pairs": 6,
+      "average_distance": 3.3333333333333335,
+      "minimum_distance": 1.0,
+      "maximum_distance": 6.0
+    }
+  },
+  "unreachable_value": null,
+  "distances": [
+    [
+      0.0,
+      3.0,
+      6.0,
+      5.0
+    ],
+    [
+      null,
+      0.0,
+      3.0,
+      2.0
+    ],
+    [
+      null,
+      null,
+      0.0,
+      null
+    ],
+    [
+      null,
+      null,
+      1.0,
+      0.0
+    ]
+  ],
+  "paths": [
+    {
+      "source": "A",
+      "target": "A",
+      "path": [
+        "A"
+      ]
+    },
+    {
+      "source": "A",
+      "target": "B",
+      "path": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "source": "A",
+      "target": "D",
+      "path": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "source": "A",
+      "target": "C",
+      "path": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "source": "B",
+      "target": "A",
+      "path": null
+    },
+    {
+      "source": "B",
+      "target": "B",
+      "path": [
+        "B"
+      ]
+    },
+    {
+      "source": "B",
+      "target": "D",
+      "path": [
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "source": "B",
+      "target": "C",
+      "path": [
+        "B",
+        "C"
+      ]
+    },
+    {
+      "source": "D",
+      "target": "A",
+      "path": null
+    },
+    {
+      "source": "D",
+      "target": "B",
+      "path": null
+    },
+    {
+      "source": "D",
+      "target": "D",
+      "path": [
+        "D"
+      ]
+    },
+    {
+      "source": "D",
+      "target": "C",
+      "path": null
+    },
+    {
+      "source": "C",
+      "target": "A",
+      "path": null
+    },
+    {
+      "source": "C",
+      "target": "B",
+      "path": null
+    },
+    {
+      "source": "C",
+      "target": "D",
+      "path": [
+        "C",
+        "D"
+      ]
+    },
+    {
+      "source": "C",
+      "target": "C",
+      "path": [
+        "C"
+      ]
+    }
+  ],
+  "algorithm_rationale": "Floyd-Warshall foi escolhido por calcular todos os pares, permitir matrizes e consultas reutilizáveis e oferecer uma implementação didática com pesos negativos. É adequado à escala demonstrada, mas não é universalmente superior: tempo O(V³) e espaço O(V²) limitam redes grandes. Para poucas origens e pesos não negativos, Dijkstra pode ser mais adequado; para todos os pares em redes esparsas, Johnson merece avaliação. As redes maiores deste projeto são esparsas e positivas. A concordância com Bellman-Ford apoia a correção dos casos testados, mas medições pontuais não demonstram superioridade geral, e Dijkstra e Johnson não foram medidos."
+}

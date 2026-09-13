@@ -1,0 +1,210 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Relatório Floyd-Warshall</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px}pre{white-space:pre-wrap}</style><h1>Relatório Floyd-Warshall</h1><p>Distâncias ausentes: null. Tempo sem instrumentação; pico de alocações Python em execução separada.</p><h2>Justificativa da escolha e limitações</h2><p>Floyd-Warshall foi escolhido por calcular todos os pares, permitir matrizes e consultas reutilizáveis e oferecer uma implementação didática com pesos negativos. É adequado à escala demonstrada, mas não é universalmente superior: tempo O(V³) e espaço O(V²) limitam redes grandes. Para poucas origens e pesos não negativos, Dijkstra pode ser mais adequado; para todos os pares em redes esparsas, Johnson merece avaliação. As redes maiores deste projeto são esparsas e positivas. A concordância com Bellman-Ford apoia a correção dos casos testados, mas medições pontuais não demonstram superioridade geral, e Dijkstra e Johnson não foram medidos.</p><pre>{
+  &quot;dataset&quot;: &quot;grafo_exemplo.csv&quot;,
+  &quot;algorithm&quot;: &quot;Floyd-Warshall próprio&quot;,
+  &quot;vertices&quot;: [
+    &quot;A&quot;,
+    &quot;B&quot;,
+    &quot;D&quot;,
+    &quot;C&quot;
+  ],
+  &quot;edges&quot;: [
+    [
+      &quot;A&quot;,
+      &quot;B&quot;,
+      3.0
+    ],
+    [
+      &quot;A&quot;,
+      &quot;D&quot;,
+      10.0
+    ],
+    [
+      &quot;B&quot;,
+      &quot;C&quot;,
+      2.0
+    ],
+    [
+      &quot;C&quot;,
+      &quot;D&quot;,
+      1.0
+    ]
+  ],
+  &quot;metrics&quot;: {
+    &quot;vertices&quot;: 4,
+    &quot;edges&quot;: 4,
+    &quot;density&quot;: 33.33333333333333,
+    &quot;execution_time_ms&quot;: 0.06697799835819751,
+    &quot;peak_memory_kb&quot;: 1.6328125,
+    &quot;reachable_pairs&quot;: 6,
+    &quot;unreachable_pairs&quot;: 6,
+    &quot;average_distance&quot;: 3.3333333333333335,
+    &quot;minimum_distance&quot;: 1.0,
+    &quot;maximum_distance&quot;: 6.0
+  },
+  &quot;comparison&quot;: {
+    &quot;distances_match&quot;: true,
+    &quot;floyd_warshall&quot;: {
+      &quot;vertices&quot;: 4,
+      &quot;edges&quot;: 4,
+      &quot;density&quot;: 33.33333333333333,
+      &quot;execution_time_ms&quot;: 0.02160000440198928,
+      &quot;peak_memory_kb&quot;: 1.6015625,
+      &quot;reachable_pairs&quot;: 6,
+      &quot;unreachable_pairs&quot;: 6,
+      &quot;average_distance&quot;: 3.3333333333333335,
+      &quot;minimum_distance&quot;: 1.0,
+      &quot;maximum_distance&quot;: 6.0
+    },
+    &quot;bellman_ford&quot;: {
+      &quot;vertices&quot;: 4,
+      &quot;edges&quot;: 4,
+      &quot;density&quot;: 33.33333333333333,
+      &quot;execution_time_ms&quot;: 0.7378399968729354,
+      &quot;peak_memory_kb&quot;: 4.6015625,
+      &quot;reachable_pairs&quot;: 6,
+      &quot;unreachable_pairs&quot;: 6,
+      &quot;average_distance&quot;: 3.3333333333333335,
+      &quot;minimum_distance&quot;: 1.0,
+      &quot;maximum_distance&quot;: 6.0
+    }
+  },
+  &quot;unreachable_value&quot;: null,
+  &quot;distances&quot;: [
+    [
+      0.0,
+      3.0,
+      6.0,
+      5.0
+    ],
+    [
+      null,
+      0.0,
+      3.0,
+      2.0
+    ],
+    [
+      null,
+      null,
+      0.0,
+      null
+    ],
+    [
+      null,
+      null,
+      1.0,
+      0.0
+    ]
+  ],
+  &quot;paths&quot;: [
+    {
+      &quot;source&quot;: &quot;A&quot;,
+      &quot;target&quot;: &quot;A&quot;,
+      &quot;path&quot;: [
+        &quot;A&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;A&quot;,
+      &quot;target&quot;: &quot;B&quot;,
+      &quot;path&quot;: [
+        &quot;A&quot;,
+        &quot;B&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;A&quot;,
+      &quot;target&quot;: &quot;D&quot;,
+      &quot;path&quot;: [
+        &quot;A&quot;,
+        &quot;B&quot;,
+        &quot;C&quot;,
+        &quot;D&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;A&quot;,
+      &quot;target&quot;: &quot;C&quot;,
+      &quot;path&quot;: [
+        &quot;A&quot;,
+        &quot;B&quot;,
+        &quot;C&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;B&quot;,
+      &quot;target&quot;: &quot;A&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;B&quot;,
+      &quot;target&quot;: &quot;B&quot;,
+      &quot;path&quot;: [
+        &quot;B&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;B&quot;,
+      &quot;target&quot;: &quot;D&quot;,
+      &quot;path&quot;: [
+        &quot;B&quot;,
+        &quot;C&quot;,
+        &quot;D&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;B&quot;,
+      &quot;target&quot;: &quot;C&quot;,
+      &quot;path&quot;: [
+        &quot;B&quot;,
+        &quot;C&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;D&quot;,
+      &quot;target&quot;: &quot;A&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;D&quot;,
+      &quot;target&quot;: &quot;B&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;D&quot;,
+      &quot;target&quot;: &quot;D&quot;,
+      &quot;path&quot;: [
+        &quot;D&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;D&quot;,
+      &quot;target&quot;: &quot;C&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;C&quot;,
+      &quot;target&quot;: &quot;A&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;C&quot;,
+      &quot;target&quot;: &quot;B&quot;,
+      &quot;path&quot;: null
+    },
+    {
+      &quot;source&quot;: &quot;C&quot;,
+      &quot;target&quot;: &quot;D&quot;,
+      &quot;path&quot;: [
+        &quot;C&quot;,
+        &quot;D&quot;
+      ]
+    },
+    {
+      &quot;source&quot;: &quot;C&quot;,
+      &quot;target&quot;: &quot;C&quot;,
+      &quot;path&quot;: [
+        &quot;C&quot;
+      ]
+    }
+  ]
+}</pre></html>

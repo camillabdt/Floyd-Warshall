@@ -1,0 +1,17 @@
+source,target,distance,path
+A,A,0.0,A
+A,B,3.0,A → B
+A,D,6.0,A → B → C → D
+A,C,5.0,A → B → C
+B,A,,
+B,B,0.0,B
+B,D,3.0,B → C → D
+B,C,2.0,B → C
+D,A,,
+D,B,,
+D,D,0.0,D
+D,C,,
+C,A,,
+C,B,,
+C,D,1.0,C → D
+C,C,0.0,C

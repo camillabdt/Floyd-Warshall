@@ -1,224 +1,48 @@
+"""Grafo dirigido com curvas distintas para arestas recíprocas e laços."""
+from html import escape
+from math import cos, sin, pi
 import networkx as nx
 import plotly.graph_objects as go
-
-from floyd_warshall.domain.graph import Graph
-from floyd_warshall.domain.graph_visualizer import (
-    GraphVisualizer,
-)
+from floyd_warshall.domain.graph_visualizer import GraphVisualizer
 
 
 class PlotlyGraphVisualizer(GraphVisualizer):
-    """
-    Visualizador interativo de grafos usando Plotly.
-
-    NetworkX é utilizado somente para calcular
-    a disposição visual dos vértices.
-    """
-
-    def create(
-        self,
-        graph: Graph,
-        highlighted_path: list[str] | None = None,
-    ) -> go.Figure:
-
-        nx_graph = nx.DiGraph()
-
-        for vertex in graph.vertices():
-            nx_graph.add_node(vertex)
-
-        for origin, destination, weight in graph.edges():
-            nx_graph.add_edge(
-                origin,
-                destination,
-                weight=weight,
-            )
-
-        positions = nx.spring_layout(
-            nx_graph,
-            seed=42,
-        )
-
-        highlighted_edges = set()
-
-        if highlighted_path:
-            highlighted_edges = {
-                (
-                    highlighted_path[i],
-                    highlighted_path[i + 1],
-                )
-                for i in range(
-                    len(highlighted_path) - 1
-                )
-            }
-
+    def create(self, graph, highlighted_path=None):
+        g = nx.DiGraph()
+        g.add_nodes_from(graph.vertices())
+        g.add_weighted_edges_from(graph.edges())
+        positions = nx.spring_layout(g, seed=42, weight=None)
+        highlighted = set(zip(highlighted_path or [], (highlighted_path or [])[1:]))
         figure = go.Figure()
-
-        # =========================
-        # ARESTAS NORMAIS
-        # =========================
-
-        for origin, destination, weight in graph.edges():
-
-            x0, y0 = positions[origin]
-            x1, y1 = positions[destination]
-
-            is_highlighted = (
-                origin,
-                destination,
-            ) in highlighted_edges
-
-            figure.add_trace(
-                go.Scatter(
-                    x=[x0, x1],
-                    y=[y0, y1],
-                    mode="lines",
-                    line=dict(
-                        width=(
-                            5
-                            if is_highlighted
-                            else 2
-                        ),
-                        color=(
-                            "#e74c3c"
-                            if is_highlighted
-                            else "#7f8c8d"
-                        ),
-                    ),
-                    hoverinfo="none",
-                    showlegend=False,
-                )
-            )
-
-            # Peso da aresta
-            middle_x = (
-                x0 + x1
-            ) / 2
-
-            middle_y = (
-                y0 + y1
-            ) / 2
-
-            figure.add_annotation(
-                x=middle_x,
-                y=middle_y,
-                text=str(
-                    int(weight)
-                    if float(weight).is_integer()
-                    else weight
-                ),
-                showarrow=False,
-                font=dict(
-                    size=14,
-                ),
-                bgcolor="white",
-                bordercolor="#cccccc",
-                borderwidth=1,
-            )
-
-            # Pequena seta indicando direção
-            figure.add_annotation(
-                x=x1,
-                y=y1,
-                ax=x0,
-                ay=y0,
-                xref="x",
-                yref="y",
-                axref="x",
-                ayref="y",
-                showarrow=True,
-                arrowhead=3,
-                arrowsize=1.2,
-                arrowwidth=(
-                    3
-                    if is_highlighted
-                    else 1.5
-                ),
-                arrowcolor=(
-                    "#e74c3c"
-                    if is_highlighted
-                    else "#7f8c8d"
-                ),
-                opacity=0.8,
-            )
-
-        # =========================
-        # VÉRTICES
-        # =========================
-
-        node_x = []
-        node_y = []
-        labels = []
-        node_colors = []
-
-        highlighted_nodes = set(
-            highlighted_path or []
-        )
-
-        for vertex in graph.vertices():
-
-            x, y = positions[vertex]
-
-            node_x.append(x)
-            node_y.append(y)
-            labels.append(vertex)
-
-            if vertex in highlighted_nodes:
-                node_colors.append(
-                    "#e74c3c"
-                )
+        for u, v, weight in graph.edges():
+            x0, y0 = positions[u]
+            x1, y1 = positions[v]
+            color = '#dc2626' if (u, v) in highlighted else '#64748b'
+            width = 4 if (u, v) in highlighted else 2
+            if u == v:
+                xs = [x0 + .12*sin(2*pi*t/40) for t in range(41)]
+                ys = [y0 + .12*(1-cos(2*pi*t/40)) for t in range(41)]
             else:
-                node_colors.append(
-                    "#3498db"
-                )
-
-        figure.add_trace(
-            go.Scatter(
-                x=node_x,
-                y=node_y,
-                mode="markers+text",
-                text=labels,
-                textposition="top center",
-                hovertext=[
-                    f"Vértice: {label}"
-                    for label in labels
-                ],
-                hoverinfo="text",
-                marker=dict(
-                    size=28,
-                    color=node_colors,
-                    line=dict(
-                        width=2,
-                        color="white",
-                    ),
-                ),
-                textfont=dict(
-                    size=15,
-                ),
-                showlegend=False,
-            )
-        )
-
-        figure.update_layout(
-            title="Visualização do grafo",
-            showlegend=False,
-            hovermode="closest",
-            margin=dict(
-                l=20,
-                r=20,
-                t=50,
-                b=20,
-            ),
-            xaxis=dict(
-                showgrid=False,
-                zeroline=False,
-                showticklabels=False,
-            ),
-            yaxis=dict(
-                showgrid=False,
-                zeroline=False,
-                showticklabels=False,
-            ),
-            height=550,
-        )
-
+                bend = .18 if g.has_edge(v, u) else 0
+                cx, cy = (x0+x1)/2 - bend*(y1-y0), (y0+y1)/2 + bend*(x1-x0)
+                ts = [t/40 for t in range(41)]
+                xs = [(1-t)**2*x0 + 2*(1-t)*t*cx + t*t*x1 for t in ts]
+                ys = [(1-t)**2*y0 + 2*(1-t)*t*cy + t*t*y1 for t in ts]
+            figure.add_trace(go.Scatter(x=xs, y=ys, mode='lines',
+                line=dict(color=color, width=width), hovertemplate=f'{escape(u)} → {escape(v)}: {weight:g}<extra></extra>'))
+            figure.add_annotation(x=xs[20], y=ys[20], text=f'{weight:g}', showarrow=False,
+                                  bgcolor='white', font=dict(color='#0f172a'))
+            figure.add_annotation(x=xs[33], y=ys[33], ax=xs[29], ay=ys[29],
+                xref='x', yref='y', axref='x', ayref='y', text='', showarrow=True,
+                arrowhead=3, arrowwidth=width, arrowcolor=color)
+        nodes = graph.vertices()
+        figure.add_trace(go.Scatter(x=[positions[v][0] for v in nodes],
+            y=[positions[v][1] for v in nodes], mode='markers+text',
+            text=[escape(v) for v in nodes], textposition='top center',
+            marker=dict(size=24, color=['#dc2626' if v in (highlighted_path or []) else '#2563eb' for v in nodes]),
+            hovertemplate='%{text}<extra></extra>'))
+        figure.update_layout(showlegend=False, height=550, template='plotly_white',
+            margin=dict(l=30,r=30,t=30,b=30),
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, scaleanchor='x'))
         return figure

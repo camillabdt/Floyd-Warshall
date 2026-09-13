@@ -125,7 +125,7 @@ class DatasetManager:
 
         try:
             dataframe = pd.read_csv(
-                BytesIO(content)
+                BytesIO(content), dtype=str, keep_default_na=False
             )
         except Exception as exc:
             raise ValueError(
@@ -206,21 +206,24 @@ class DatasetManager:
 
         graph = self.graph_factory()
 
+        if not isinstance(payload["edges"], list) or not isinstance(payload.get("vertices", []), list):
+            raise ValueError("vertices e edges devem ser listas.")
+
         # Permite representar vértices isolados.
         for vertex in payload.get(
             "vertices",
             [],
         ):
             graph.add_vertex(
-                str(vertex)
+                vertex
             )
 
         for edge in payload["edges"]:
             try:
                 graph.add_edge(
-                    str(edge["source"]),
-                    str(edge["target"]),
-                    float(edge["weight"]),
+                    edge["source"],
+                    edge["target"],
+                    edge["weight"],
                 )
             except (
                 KeyError,

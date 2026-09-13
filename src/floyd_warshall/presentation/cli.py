@@ -1,5 +1,8 @@
 import argparse
 import sys
+from pathlib import Path
+from floyd_warshall.infrastructure.dataset_manager import DatasetManager
+from floyd_warshall.infrastructure.networkx_graph import NetworkXGraph
 from floyd_warshall.application.floyd_warshall_solver import FloydWarshallSolver, NegativeCycleError
 from floyd_warshall.infrastructure.text_graph_reader import TextGraphReader
 from floyd_warshall.presentation.console_renderer import ConsoleRenderer
@@ -9,7 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='Caminhos mínimos entre todos os pares com Floyd-Warshall.'
     )
-    parser.add_argument('arquivo', help='Arquivo: origem destino peso')
+    parser.add_argument('arquivo', help='Arquivo TXT, CSV ou JSON')
     parser.add_argument('--origem', help='Vértice de origem para consulta')
     parser.add_argument('--destino', help='Vértice de destino para consulta')
     return parser
@@ -27,7 +30,9 @@ def main() -> None:
     renderer = ConsoleRenderer()
 
     try:
-        graph = reader.read(args.arquivo)
+        path = Path(args.arquivo)
+        graph = (DatasetManager(path.parent, NetworkXGraph).load(path.name)
+                 if path.suffix.lower() in {".csv", ".json"} else reader.read(args.arquivo))
         result = solver.solve(graph)
         renderer.render(result)
         if args.origem and args.destino:

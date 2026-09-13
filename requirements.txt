@@ -1,1 +1,6 @@
-networkx>=3.4,<4.0
+# Compatibilidade opcional. A instalação reprodutível usa poetry.lock.
+networkx>=3.4,<4
+streamlit>=1.63,<2
+python-dotenv>=1.2.3,<2
+pandas>=3.0.5,<4
+plotly>=7,<8

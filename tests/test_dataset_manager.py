@@ -1,229 +1,40 @@
-from __future__ import annotations
-
-from collections.abc import Callable
-from io import BytesIO
 import json
-from pathlib import Path
-
-import pandas as pd
-
-from floyd_warshall.domain.graph import Graph
+import pytest
+from floyd_warshall.infrastructure.dataset_manager import DatasetManager
+from floyd_warshall.infrastructure.networkx_graph import NetworkXGraph
 
 
-class DatasetManager:
-    """Gerencia listagem, validação, carregamento e salvamento de datasets."""
+@pytest.fixture
+def manager(tmp_path):
+    return DatasetManager(tmp_path, NetworkXGraph)
 
-    ALLOWED_SUFFIXES = {".csv", ".json"}
 
-    def __init__(
-        self,
-        base_dir: str | Path,
-        graph_factory: Callable[[], Graph],
-    ) -> None:
-        self.base_dir = Path(base_dir)
-        self.graph_factory = graph_factory
+def test_csv_preserves_labels_and_duplicate_minimum(manager):
+    g = manager.load_bytes('x.csv', b'source,target,weight\n001,NA,8\n001,NA,2\n001,NA,9\n')
+    assert g.vertices() == ['001', 'NA']
+    assert g.edges() == [('001', 'NA', 2.0)]
 
-        self.base_dir.mkdir(
-            parents=True,
-            exist_ok=True,
-        )
 
-    def list_datasets(self) -> list[str]:
-        return sorted(
-            path.name
-            for path in self.base_dir.iterdir()
-            if path.is_file()
-            and path.suffix.lower() in self.ALLOWED_SUFFIXES
-        )
+def test_save_reload_and_isolated_vertex(manager):
+    content = b'{"vertices":["Z"],"edges":[]}'
+    manager.save('isolated.json', content)
+    assert manager.list_datasets() == ['isolated.json']
+    assert manager.load('isolated.json').vertices() == ['Z']
 
-    def save(
-        self,
-        filename: str,
-        content: bytes,
-    ) -> Path:
 
-        safe_name = Path(filename).name
-        suffix = Path(safe_name).suffix.lower()
+@pytest.mark.parametrize('content', [b'{}', b'{', b'{"edges":null}', b'{"vertices":"A","edges":[]}', b'{"edges":[{}]}', b'{"edges":[{"source":null,"target":"A","weight":1}]}'])
+def test_invalid_json(manager, content):
+    with pytest.raises(ValueError):
+        manager.load_bytes('bad.json', content)
 
-        if suffix not in self.ALLOWED_SUFFIXES:
-            raise ValueError(
-                "Formato não suportado. Use CSV ou JSON."
-            )
 
-        # Valida antes de salvar
-        self.load_bytes(
-            safe_name,
-            content,
-        )
+@pytest.mark.parametrize('weight', ['nan', 'inf', '-inf', 'abc', ''])
+def test_invalid_csv_weights(manager, weight):
+    with pytest.raises(ValueError):
+        manager.load_bytes('bad.csv', f'source,target,weight\nA,B,{weight}\n'.encode())
 
-        destination = (
-            self.base_dir / safe_name
-        )
 
-        destination.write_bytes(content)
-
-        return destination
-
-    def load(
-        self,
-        name: str,
-    ) -> Graph:
-
-        path = (
-            self.base_dir
-            / Path(name).name
-        )
-
-        if not path.exists():
-            raise FileNotFoundError(
-                f"Dataset não encontrado: {name}"
-            )
-
-        return self.load_bytes(
-            path.name,
-            path.read_bytes(),
-        )
-
-    def load_bytes(
-        self,
-        filename: str,
-        content: bytes,
-    ) -> Graph:
-
-        suffix = (
-            Path(filename)
-            .suffix
-            .lower()
-        )
-
-        if suffix == ".csv":
-            return self._load_csv(content)
-
-        if suffix == ".json":
-            return self._load_json(content)
-
-        raise ValueError(
-            "Formato não suportado. Use CSV ou JSON."
-        )
-
-    def _load_csv(
-        self,
-        content: bytes,
-    ) -> Graph:
-
-        dataframe = pd.read_csv(
-            BytesIO(content)
-        )
-
-        required = {
-            "source",
-            "target",
-            "weight",
-        }
-
-        if not required.issubset(
-            dataframe.columns
-        ):
-            raise ValueError(
-                "CSV deve conter as colunas: "
-                "source,target,weight"
-            )
-
-        graph = self.graph_factory()
-
-        for row in dataframe.itertuples(
-            index=False
-        ):
-
-            try:
-                graph.add_edge(
-                    str(row.source),
-                    str(row.target),
-                    float(row.weight),
-                )
-
-            except (
-                TypeError,
-                ValueError,
-            ) as exc:
-
-                raise ValueError(
-                    "O campo weight deve ser numérico."
-                ) from exc
-
-        if not graph.vertices():
-            raise ValueError(
-                "O dataset não contém vértices."
-            )
-
-        return graph
-
-    def _load_json(
-        self,
-        content: bytes,
-    ) -> Graph:
-
-        try:
-            payload = json.loads(
-                content.decode("utf-8")
-            )
-
-        except (
-            UnicodeDecodeError,
-            json.JSONDecodeError,
-        ) as exc:
-
-            raise ValueError(
-                "JSON inválido."
-            ) from exc
-
-        if isinstance(payload, list):
-            payload = {
-                "edges": payload
-            }
-
-        if (
-            not isinstance(payload, dict)
-            or "edges" not in payload
-        ):
-            raise ValueError(
-                "JSON deve conter "
-                "a chave 'edges'."
-            )
-
-        graph = self.graph_factory()
-
-        for vertex in payload.get(
-            "vertices",
-            [],
-        ):
-            graph.add_vertex(
-                str(vertex)
-            )
-
-        for edge in payload["edges"]:
-
-            try:
-                graph.add_edge(
-                    str(edge["source"]),
-                    str(edge["target"]),
-                    float(edge["weight"]),
-                )
-
-            except (
-                KeyError,
-                TypeError,
-                ValueError,
-            ) as exc:
-
-                raise ValueError(
-                    "Cada aresta JSON deve ter "
-                    "source, target e weight numérico."
-                ) from exc
-
-        if not graph.vertices():
-            raise ValueError(
-                "O dataset não contém vértices."
-            )
-
-        return graph
+def test_invalid_save_does_not_write(manager):
+    with pytest.raises(ValueError):
+        manager.save('bad.csv', b'wrong,header\n')
+    assert manager.list_datasets() == []
