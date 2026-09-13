@@ -6,13 +6,14 @@
 </p>
 
 <p align="center">
-  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.11+-1F3A5F?style=for-the-badge&amp;logo=python&amp;logoColor=white&amp;labelColor=15263D" alt="Python 3.11+"></a>
-  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Poetry-1.8+-1F3A5F?style=for-the-badge&amp;logo=poetry&amp;logoColor=white&amp;labelColor=15263D" alt="Poetry 1.8+"></a>
-  <a href="poetry.lock"><img src="https://img.shields.io/badge/NetworkX-3.6-1F3A5F?style=for-the-badge&amp;labelColor=15263D" alt="NetworkX 3.6"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&amp;logo=python&amp;logoColor=white" alt="Python 3.11+"></a>
+  <a href="poetry.lock"><img src="https://img.shields.io/badge/NetworkX-3.6-2C2D72?style=for-the-badge" alt="NetworkX 3.6"></a>
+  <a href="poetry.lock"><img src="https://img.shields.io/badge/Streamlit-1.63-FF4B4B?style=for-the-badge&amp;logo=streamlit&amp;logoColor=white" alt="Streamlit 1.63"></a>
+  <a href="poetry.lock"><img src="https://img.shields.io/badge/Plotly-7.0-3F4F75?style=for-the-badge&amp;logo=plotly&amp;logoColor=white" alt="Plotly 7.0"></a>
   <br>
-  <a href="poetry.lock"><img src="https://img.shields.io/badge/Streamlit-1.63-1F3A5F?style=for-the-badge&amp;logo=streamlit&amp;logoColor=white&amp;labelColor=15263D" alt="Streamlit 1.63"></a>
-  <a href="poetry.lock"><img src="https://img.shields.io/badge/Plotly-7.0-1F3A5F?style=for-the-badge&amp;logo=plotly&amp;logoColor=white&amp;labelColor=15263D" alt="Plotly 7.0"></a>
-  <a href="pyproject.toml"><img src="https://img.shields.io/badge/pytest-8.3-1F3A5F?style=for-the-badge&amp;logo=pytest&amp;logoColor=white&amp;labelColor=15263D" alt="pytest 8.3"></a>
+  <a href="poetry.lock"><img src="https://img.shields.io/badge/pandas-3.0-150458?style=for-the-badge&amp;logo=pandas&amp;logoColor=white" alt="pandas 3.0"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Poetry-1.8+-60A5FA?style=for-the-badge&amp;logo=poetry&amp;logoColor=white" alt="Poetry 1.8+"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/pytest-8.3-0A9EDC?style=for-the-badge&amp;logo=pytest&amp;logoColor=white" alt="pytest 8.3"></a>
 </p>
 
 <p align="center">
@@ -63,16 +64,6 @@ Os arquivos de `reports/` são gerados por `scripts/generate_evidence.py` e `scr
 | Configuração | python-dotenv  | Leitura opcional de `.env`                                          |
 | Ambiente     | Poetry 1.8+    | Dependências fixadas em [poetry.lock](poetry.lock)                  |
 | Testes       | pytest 8.3     | Suíte em [tests/](tests/)                                           |
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&amp;logo=python&amp;logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/NetworkX-2C2D72?style=for-the-badge" alt="NetworkX">
-  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&amp;logo=streamlit&amp;logoColor=white" alt="Streamlit">
-  <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&amp;logo=plotly&amp;logoColor=white" alt="Plotly">
-  <img src="https://img.shields.io/badge/pandas-150458?style=for-the-badge&amp;logo=pandas&amp;logoColor=white" alt="pandas">
-  <img src="https://img.shields.io/badge/Poetry-60A5FA?style=for-the-badge&amp;logo=poetry&amp;logoColor=white" alt="Poetry">
-  <img src="https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&amp;logo=pytest&amp;logoColor=white" alt="pytest">
-</p>
 
 ## Executar
 
