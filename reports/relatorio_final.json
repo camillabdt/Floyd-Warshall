@@ -34,7 +34,7 @@
     "vertices": 4,
     "edges": 4,
     "density": 33.33333333333333,
-    "execution_time_ms": 0.024654000299051404,
+    "execution_time_ms": 0.026191002689301968,
     "peak_memory_kb": 1.6328125,
     "reachable_pairs": 6,
     "unreachable_pairs": 6,
@@ -48,7 +48,7 @@
       "vertices": 4,
       "edges": 4,
       "density": 33.33333333333333,
-      "execution_time_ms": 0.014107994502410293,
+      "execution_time_ms": 0.014596997061744332,
       "peak_memory_kb": 1.609375,
       "reachable_pairs": 6,
       "unreachable_pairs": 6,
@@ -60,7 +60,7 @@
       "vertices": 4,
       "edges": 4,
       "density": 33.33333333333333,
-      "execution_time_ms": 0.2664460043888539,
+      "execution_time_ms": 0.26791400159709156,
       "peak_memory_kb": 5.109375,
       "reachable_pairs": 6,
       "unreachable_pairs": 6,
@@ -212,30 +212,56 @@
     {
       "vertices": 10,
       "edges": 90,
-      "median_ms": 0.11139799607917666,
-      "ms_per_n3": 0.00011139799607917666,
-      "repeats": 3
+      "median_ms": 0.125994993140921,
+      "ms_per_n3": 0.000125994993140921,
+      "repeats": 3,
+      "time_ratio": null,
+      "loglog_slope": null
     },
     {
       "vertices": 20,
       "edges": 380,
-      "median_ms": 0.6584000075235963,
-      "ms_per_n3": 8.230000094044954e-05,
-      "repeats": 3
+      "median_ms": 0.8427150023635477,
+      "ms_per_n3": 0.00010533937529544346,
+      "repeats": 3,
+      "time_ratio": 6.688480084450661,
+      "loglog_slope": 2.74167840462549
     },
     {
       "vertices": 40,
       "edges": 1560,
-      "median_ms": 4.643720007152297,
-      "ms_per_n3": 7.255812511175463e-05,
-      "repeats": 3
+      "median_ms": 5.93469399609603,
+      "ms_per_n3": 9.272959368900047e-05,
+      "repeats": 3,
+      "time_ratio": 7.042349999051993,
+      "loglog_slope": 2.816056929749868
     },
     {
       "vertices": 80,
       "edges": 6320,
-      "median_ms": 34.994929999811575,
-      "ms_per_n3": 6.834947265588198e-05,
-      "repeats": 3
+      "median_ms": 44.85169799590949,
+      "ms_per_n3": 8.760097264826072e-05,
+      "repeats": 3,
+      "time_ratio": 7.557541808459527,
+      "loglog_slope": 2.9179170548904145
+    },
+    {
+      "vertices": 160,
+      "edges": 25440,
+      "median_ms": 351.5724210010376,
+      "ms_per_n3": 8.583311059595644e-05,
+      "repeats": 3,
+      "time_ratio": 7.838553203339175,
+      "loglog_slope": 2.9705873942657686
+    },
+    {
+      "vertices": 320,
+      "edges": 102080,
+      "median_ms": 2829.3742329988163,
+      "ms_per_n3": 8.634564920040333e-05,
+      "repeats": 3,
+      "time_ratio": 8.047770712340562,
+      "loglog_slope": 3.0085892021512137
     }
   ],
   "networks": [
