@@ -208,3 +208,22 @@ O ZIP de entrega contém aplicativo, datasets, código, testes, documentação, 
 - [Justificativa da escolha do algoritmo](docs/JUSTIFICATIVA_ESCOLHA.md)
 - [Catálogo de datasets e método de geração](docs/DATASETS.md)
 - [Relatório de validação da entrega](docs/VALIDACAO.md)
+
+## Autoras
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/amandadiasdev">
+        <img src="https://github.com/amandadiasdev.png" width="100" alt="Amanda Dias"><br>
+        <sub><b>Amanda Dias</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/camillabdt">
+        <img src="https://github.com/camillabdt.png" width="100" alt="Camilla Borchhardt"><br>
+        <sub><b>Camilla Borchhardt</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
