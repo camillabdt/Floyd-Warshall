@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Como o grafo vira uma tabela de distâncias, com animação célula a célula da matriz inicial.">
+<title>A matriz de distâncias | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html" aria-current="page"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 02 de 08</p><h1>A matriz de distâncias</h1><p class="lead">O algoritmo não trabalha sobre o desenho. Ele trabalha sobre uma tabela quadrada em que cada célula guarda o melhor custo conhecido entre uma origem e um destino.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="ideia">
+<h2>Uma tabela de preços entre cidades</h2>
+<p>Pense na tabela de preços que algumas rodoviárias penduram na parede: a linha é de onde você sai, a coluna é para onde você vai,
+e o cruzamento mostra o preço. A matriz de distâncias é isso, com duas convenções.</p>
+<ul>
+<li><strong>Diagonal igual a zero.</strong> Ficar onde você já está não custa nada.</li>
+<li><strong>Infinito quer dizer "ainda não sei chegar".</strong> Não significa impossível para sempre. Muitas dessas células
+serão preenchidas quando o algoritmo descobrir caminhos indiretos.</li>
+</ul>
+</section>
+
+<section id="montagem">
+<h2>Veja a matriz inicial sendo montada</h2>
+<p>Toque a animação. Ela começa com tudo em infinito, coloca os zeros da diagonal e depois joga cada aresta na sua célula.</p>
+<div data-build-lab
+     data-title="Do desenho para a tabela"
+     data-badge="Animação"
+     data-sub="Só as arestas diretas entram nesta fase. Nenhum caminho com parada no meio foi calculado ainda."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<p>No fim, a linha A tem 0, 3, ∞ e 10. Olhe para a célula da linha A com a coluna C: vale infinito, embora exista
+o caminho A → B → C. A matriz inicial só conhece arestas diretas. Descobrir esse 5 é o trabalho do algoritmo.</p>
+</section>
+
+<section id="leitura">
+<h2>Como ler uma célula sem se perder</h2>
+<div class="table-wrap"><table>
+<caption>Convenções usadas em todo o material</caption>
+<thead><tr><th>Célula</th><th>Significado</th><th>Valor inicial</th></tr></thead>
+<tbody>
+<tr><td><code>dist[i][i]</code></td><td>custo de ficar parado</td><td>0</td></tr>
+<tr><td><code>dist[i][j]</code> com aresta direta</td><td>peso da aresta i → j</td><td>o peso declarado</td></tr>
+<tr><td><code>dist[i][j]</code> sem aresta direta</td><td>nenhum caminho conhecido ainda</td><td>∞</td></tr>
+</tbody></table></div>
+<p>A ordem das linhas e das colunas é a mesma lista de vértices. No projeto, essa lista vem de
+<code>graph.vertices()</code> e o dicionário <code>index</code> converte o nome do vértice na sua posição numérica.</p>
+<div class="note caution"><span class="note-label">Atenção com arestas repetidas</span>
+<p>Se o arquivo trouxer duas arestas entre o mesmo par, a menor vence. No código do projeto isso aparece como
+<code>if weight &lt; dist[i][j]</code> na hora de preencher a matriz inicial, e não como uma simples atribuição.</p></div>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Por que a célula da linha D com a coluna A vale infinito, se existe a aresta A → D?</summary>
+<div class="answer"><p>Porque o grafo é dirigido. A aresta A → D permite ir de A para D, não o contrário. A célula D, A pergunta
+como sair de D e chegar a A, e nenhuma aresta sai de D.</p></div></details>
+<details><summary>Se um par ficar com infinito até o fim da execução, o que isso significa?</summary>
+<div class="answer"><p>Que não existe nenhum caminho entre esses dois vértices, nem direto nem com paradas.
+No projeto, esses pares são contados na métrica <code>unreachable_pairs</code>.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="01-graphs.html"><small>← Página anterior</small>Grafos e caminhos</a><a href="03-floyd-warshall.html"><small>Próxima página →</small>O algoritmo, passo a passo</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

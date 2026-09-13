@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A animação principal: o Floyd-Warshall liberando um vértice de parada por vez e atualizando a matriz.">
+<title>O algoritmo, passo a passo | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html" aria-current="page"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 03 de 08</p><h1>O algoritmo,<br>passo a passo</h1><p class="lead">Uma pergunta, repetida muitas vezes: passar por este vértice do meio deixa a viagem mais barata? A animação mostra a pergunta sendo feita e a matriz respondendo.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="ideia">
+<h2>A pergunta que se repete</h2>
+<p>O algoritmo tem três índices, e cada um tem um papel fixo:</p>
+<ul>
+<li><strong>i</strong> é de onde saímos.</li>
+<li><strong>j</strong> é para onde queremos ir.</li>
+<li><strong>k</strong> é a parada oferecida no meio do caminho.</li>
+</ul>
+<p>A comparação é sempre a mesma: <code>dist[i][k] + dist[k][j] &lt; dist[i][j]</code>. Em palavras:
+<em>ir até a parada e de lá até o destino sai mais barato do que o melhor preço que eu já tinha anotado?</em>
+Se sim, a célula é atualizada.</p>
+<div class="note"><span class="note-label">O detalhe que muda tudo</span>
+<p><code>dist[i][k]</code> não é o peso de uma aresta, é a <strong>melhor distância já descoberta</strong> entre i e k.
+Por isso um caminho de três arestas pode ser encontrado sem que o algoritmo nunca olhe para três arestas de uma vez:
+ele monta o caminho grande colando dois pedaços que já eram os melhores.</p></div>
+</section>
+
+<section id="animacao">
+<h2>A execução completa neste grafo</h2>
+<p>Aperte <strong>Tocar</strong>. As duas cores quentes marcam os dois pedaços somados; o contorno azul marca a célula
+que está sendo testada. Quando o valor melhora, a célula pisca em verde. A faixa de baixo mostra em qual etapa k estamos.</p>
+<div data-fw-lab
+     data-title="Floyd-Warshall sobre grafo_exemplo.csv"
+     data-badge="Animação principal"
+     data-sub="Quatro vértices, quatro etapas. Troque &quot;Passos mostrados&quot; para ver só as melhorias, todas as decisões ou a execução completa."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+</section>
+
+<section id="mantem">
+<h2>E quando a rota pelo meio sai mais cara?</h2>
+<p>No grafo do projeto, toda comparação que o algoritmo chega a calcular acaba encurtando alguma distância.
+Para ver o outro desfecho, a animação abaixo usa uma <strong>variação</strong> desse grafo: acrescentamos a aresta
+A → C com peso 4. Agora, na etapa k = B, o algoritmo compara 4 com 3 + 2 = 5 e decide manter o 4.</p>
+<div data-fw-lab
+     data-title="Variação com a aresta A → C de peso 4"
+     data-badge="Animação"
+     data-sub="Este grafo não é o dataset do projeto. Ele existe só para mostrar a comparação que termina em &quot;mantém&quot;."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290"
+     data-edges="A>B:3 A>C:4 A>D:10 B>C:2 C>D:1">
+<div class="no-js">Sem JavaScript: na etapa k = B, o par A → C compara 4 com 3 + 2 = 5 e mantém o 4.</div></div>
+<p>Quando o valor é mantido, a célula fica com o contorno azul e o aviso "não é menor, mantém".
+Nenhuma matriz muda nesse passo. <strong>O algoritmo faz a pergunta mesmo quando a resposta é não</strong>,
+e é por isso que o número de comparações é sempre n × n × n, independentemente de quantas melhorias existem.</p>
+</section>
+
+<section id="resumo">
+<h2>O que aconteceu de fato</h2>
+<p>Neste grafo, quatro etapas produziram três melhorias. Vale a pena saber de cor, porque é o roteiro da apresentação:</p>
+<div class="table-wrap"><table>
+<caption>As descobertas do algoritmo, etapa por etapa</caption>
+<thead><tr><th>Etapa</th><th>Descoberta</th><th>Conta</th></tr></thead>
+<tbody>
+<tr><td>k = A</td><td>nenhuma melhoria</td><td>nada chega em A, então nenhuma rota pode parar em A</td></tr>
+<tr><td>k = B</td><td>A → C passa de ∞ para 5</td><td>3 + 2</td></tr>
+<tr><td>k = C</td><td>A → D passa de 10 para 6; B → D passa de ∞ para 3</td><td>5 + 1 e 2 + 1</td></tr>
+<tr><td>k = D</td><td>nenhuma melhoria</td><td>nada sai de D, então nenhuma rota pode continuar depois de D</td></tr>
+</tbody></table></div>
+<p>Repare na etapa k = C: a conta 5 + 1 usa o 5 que só existia porque a etapa k = B tinha acabado de descobri-lo.
+<strong>O resultado de uma etapa alimenta a seguinte.</strong> É essa dependência que obriga o laço de k a ficar por fora,
+assunto do próximo capítulo.</p>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Na etapa k = B, por que o par A → D não melhora?</summary>
+<div class="answer"><p>Porque a conta seria <code>dist[A][B] + dist[B][D]</code>, ou seja, 3 + ∞. Na etapa k = B ainda não se sabe
+chegar de B até D. Esse par só melhora na etapa k = C, quando B → D já vale 3.</p></div></details>
+<details><summary>Se a aresta A → D pesasse 4 em vez de 10, o que mudaria na animação?</summary>
+<div class="answer"><p>A etapa k = C compararia 4 com 5 + 1 = 6 e manteria o 4. A célula ficaria com o contorno azul e o aviso
+"não é menor, mantém". A distância final de A a D seria 4, pela aresta direta.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="02-distance-matrix.html"><small>← Página anterior</small>A matriz de distâncias</a><a href="04-loop-order.html"><small>Próxima página →</small>Por que k fica por fora</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

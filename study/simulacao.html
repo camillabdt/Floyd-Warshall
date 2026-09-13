@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Simulação passo a passo do Floyd-Warshall em tema escuro, com o algoritmo ao lado, feita para gravação de tela.">
+<title>Simulação | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/simulacao.css">
+<script src="assets/fw.js" defer></script>
+<script src="assets/simulacao.js" defer></script>
+</head>
+<body>
+
+<header class="sim-top">
+  <span class="mark" aria-hidden="true">f/w</span>
+  <h1>Floyd-Warshall · simulação passo a passo</h1>
+  <span class="grow"></span>
+  <label for="dataset">Grafo
+    <select id="dataset"></select>
+  </label>
+  <button type="button" id="btn-tela">Tela cheia</button>
+  <a href="index.html">Caderno</a>
+</header>
+
+<main>
+
+  <!-- ---------------- tela de introdução ---------------- -->
+  <section class="screen" id="intro" aria-label="Introdução">
+    <div class="intro-grid">
+      <div class="intro-text">
+        <p class="intro-eyebrow">Caminhos mais curtos entre todos os pares</p>
+        <h2>Uma pergunta, repetida até acabarem as paradas</h2>
+        <p class="lead">O Floyd-Warshall não procura caminhos. Ele preenche uma tabela de preços,
+        e a cada rodada libera mais um lugar onde a viagem pode fazer escala.</p>
+
+        <p class="intro-formula">
+          se <span class="a">dist[i][k]</span> + <span class="b">dist[k][j]</span>
+          &lt; <span class="t">dist[i][j]</span> &nbsp;→&nbsp; troque
+        </p>
+
+        <ol class="intro-steps">
+          <li><span class="n">1</span><p><strong>A tabela.</strong> Uma matriz guarda o melhor preço já conhecido
+          de cada origem para cada destino. Começa só com as arestas diretas; o resto vale ∞.</p></li>
+          <li><span class="n">2</span><p><strong>A rodada.</strong> Uma etapa por vez, o algoritmo libera um vértice
+          <strong>k</strong> como escala permitida. Só depois de revisar todos os pares ele libera o próximo.</p></li>
+          <li><span class="n">3</span><p><strong>A pergunta.</strong> Para cada par (i, j), ele compara o preço atual
+          com ir até k e de lá até j. Se a soma for menor, a tabela muda.</p></li>
+        </ol>
+
+        <div class="intro-actions">
+          <button type="button" class="primary" id="btn-comecar">▶&nbsp; Começar a simulação</button>
+          <span class="hint"><kbd>Espaço</kbd> toca e pausa · <kbd>←</kbd> <kbd>→</kbd> andam um passo ·
+          <kbd>+</kbd> <kbd>−</kbd> mudam a velocidade · <kbd>R</kbd> recomeça · <kbd>F</kbd> tela cheia</span>
+        </div>
+      </div>
+
+      <div class="intro-graph">
+        <div id="intro-graph" style="flex:1;min-height:0;display:flex"></div>
+        <p class="cap">O grafo de <code>datasets/grafo_exemplo.csv</code>. Ir de A até D pela aresta direta custa 10;
+        dando a volta por B e por C, custa 6.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------- tela da simulação ---------------- -->
+  <section class="screen" id="sim" aria-label="Simulação" hidden>
+
+    <div class="sim-grid">
+      <div class="pane pane-graph">
+        <h2>O grafo <span class="stages" id="stages"></span></h2>
+        <div class="graph-host" id="graph-host"></div>
+        <p class="dataset-note" id="dataset-note"></p>
+      </div>
+
+      <div class="pane pane-matrix">
+        <h2>Matriz de distâncias</h2>
+        <div class="matrix-host" id="matrix-host"></div>
+        <div class="legend">
+          <span><i class="swatch a"></i>trecho i → k</span>
+          <span><i class="swatch b"></i>trecho k → j</span>
+          <span><i class="swatch t"></i>célula testada i → j</span>
+          <span><i class="swatch i"></i>recém-melhorado</span>
+        </div>
+      </div>
+
+      <div class="pane pane-code">
+        <h2>O algoritmo
+          <span class="code-switch">
+            <button type="button" id="switch-py" aria-pressed="true">Python</button>
+            <button type="button" id="switch-pt" aria-pressed="false">Português</button>
+          </span>
+        </h2>
+        <div class="code-wrap">
+          <div class="code-list" id="code-list"></div>
+          <div class="readout">
+            <h3>Estado agora</h3>
+            <div id="readout"></div>
+            <p class="verdict keep" id="verdict"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="alert" id="alerta" hidden>Ciclo de peso negativo detectado: alguma célula da diagonal ficou negativa.
+    Neste grafo não existe distância mínima, e o projeto recusa a entrada.</p>
+
+    <div class="narration" id="narration" role="status"></div>
+
+    <div class="controls">
+      <button type="button" id="btn-reset" title="Recomeçar (R)">⏮</button>
+      <button type="button" id="btn-prev" title="Voltar um passo (seta esquerda)">◀&nbsp; Voltar</button>
+      <button type="button" class="primary" id="btn-play" title="Tocar ou pausar (espaço)">▶&nbsp; Tocar</button>
+      <button type="button" id="btn-next" title="Avançar um passo (seta direita)">Avançar&nbsp; ▶</button>
+
+      <span class="speed">
+        <span>lento</span>
+        <input type="range" id="velocidade" min="-4000" max="-300" step="100" value="-1200"
+               aria-label="Velocidade da simulação, da mais lenta à esquerda para a mais rápida à direita">
+        <span>rápido</span>
+        <span class="readout-speed" id="velocidade-texto">1,2 s / passo</span>
+      </span>
+
+      <label for="detalhe">Passos
+        <select id="detalhe">
+          <option value="real" selected>Comparações reais</option>
+          <option value="wins">Só as melhorias</option>
+          <option value="full">Execução completa</option>
+        </select>
+      </label>
+
+      <span class="counter" id="counter"></span>
+      <span class="grow"></span>
+      <button type="button" id="btn-intro">Introdução</button>
+    </div>
+
+    <span class="progress"><span id="progress-bar"></span></span>
+  </section>
+
+</main>
+
+<noscript>
+  <p style="padding:24px">Esta página é uma simulação animada e precisa de JavaScript.
+  O mesmo conteúdo, em texto e tabelas, está no <a href="index.html">caderno</a>.</p>
+</noscript>
+
+</body>
+</html>

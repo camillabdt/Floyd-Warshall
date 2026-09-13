@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Caderno animado para entender e apresentar o Floyd-Warshall, com o algoritmo rodando passo a passo na tela.">
+<title>Comece aqui | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html" aria-current="page"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Caderno animado</p><h1>Veja o algoritmo<br>encurtar os caminhos</h1><p class="lead">Cada página traz uma animação do Floyd-Warshall rodando sobre o mesmo grafo que o projeto usa. Você aperta play, acompanha a matriz mudando e lê, em uma frase, por que ela mudou.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="vitrine">
+<h2>O algoritmo em quinze segundos</h2>
+<p>A animação abaixo roda sozinha. Ela mostra a descoberta central do algoritmo neste grafo: sair de A e chegar a D
+pela aresta direta custa 10, mas dar a volta por B e por C custa 6.</p>
+<div class="lab" data-hero-lab data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<div class="note"><span class="note-label">A ideia que sustenta tudo</span>
+<p>Para ir de um ponto a outro, pergunte: <strong>fazer uma parada no meio deixa a viagem mais barata?</strong>
+O Floyd-Warshall faz essa pergunta para todos os pares de pontos, liberando um vértice de parada por vez.</p></div>
+</section>
+
+<section id="simulacao-destaque">
+<h2>Para gravar a tela: a página de simulação</h2>
+<p>Existe uma página separada, em tema escuro, feita para você rodar o algoritmo passo a passo enquanto grava
+ou apresenta. Ela mostra o grafo, a matriz e <strong>o algoritmo ao lado, com a linha em execução acesa</strong>,
+além de um controle contínuo de velocidade.</p>
+<a class="lesson-card" href="simulacao.html"><span class="num">&#9654;</span>
+<h2>Abrir a simulação</h2><p>Tema escuro, tela cheia, seis grafos diferentes e velocidade ajustável de 0,3 a 4 segundos por passo.</p></a>
+</section>
+
+<section id="problema">
+<h2>O que o programa precisa resolver</h2>
+<p>A entrada é um grafo dirigido com pesos nas arestas, sem ciclos de peso negativo. A saída é a menor distância
+entre <strong>cada origem e cada destino</strong>, não apenas a partir de um ponto de partida.</p>
+<p>O enunciado pede duas explicações específicas, e cada uma ganhou uma página com animação própria:
+por que o laço do vértice intermediário fica por fora (página 04) e como reconstruir o caminho, não só a distância (página 05).</p>
+</section>
+
+<section id="rota">
+<h2>Estude nesta ordem</h2>
+<div class="lesson-grid">
+<a class="lesson-card" href="01-graphs.html"><span class="num">01</span><h2>Grafos e caminhos</h2><p>Percorra rotas e veja o custo somando aresta por aresta.</p></a>
+<a class="lesson-card" href="02-distance-matrix.html"><span class="num">02</span><h2>A matriz de distâncias</h2><p>Veja o grafo virar tabela, célula por célula.</p></a>
+<a class="lesson-card" href="03-floyd-warshall.html"><span class="num">03</span><h2>O algoritmo, passo a passo</h2><p>A animação principal: grafo e matriz mudando juntos.</p></a>
+<a class="lesson-card" href="04-loop-order.html"><span class="num">04</span><h2>Por que k fica por fora</h2><p>Duas execuções lado a lado, uma certa e uma errada.</p></a>
+<a class="lesson-card" href="05-path-reconstruction.html"><span class="num">05</span><h2>Reconstrução do caminho</h2><p>Siga as setas da matriz next_vertex até o destino.</p></a>
+<a class="lesson-card" href="06-python-implementation.html"><span class="num">06</span><h2>O código do projeto</h2><p>A linha de Python acende enquanto a matriz muda.</p></a>
+<a class="lesson-card" href="07-testing-presentation.html"><span class="num">07</span><h2>Casos difíceis e testes</h2><p>Sem caminho, peso negativo e ciclo negativo, animados.</p></a>
+<a class="lesson-card" href="08-networkx.html"><span class="num">08</span><h2>NetworkX e complexidade</h2><p>O que a biblioteca faz e por que o custo é n ao cubo.</p></a>
+</div>
+</section>
+
+<section id="uso">
+<h2>Como usar as animações</h2>
+<ul>
+<li><strong>Tocar</strong> roda sozinho; <strong>Avançar</strong> e <strong>Voltar</strong> andam um passo por vez.</li>
+<li>Com o cursor dentro de uma animação, as setas ← e → do teclado também andam passo a passo.</li>
+<li><strong>Passos mostrados</strong> escolhe o nível de detalhe: só as melhorias (o resumo da história), todas as decisões
+(inclui as comparações que não mudam nada) ou a execução completa (inclui o que o <code>continue</code> pula).</li>
+<li>O botão <strong>Imprimir página</strong> gera uma versão em papel com o estado atual das tabelas.</li>
+</ul>
+<p>As páginas usam apenas arquivos locais. Mantenha <code>index.html</code>, os capítulos e a pasta <code>assets</code> juntos.</p>
+</section>
+
+<section id="saida">
+<h2>Ao terminar, você deve conseguir</h2>
+<ul>
+<li>Explicar instância, entrada, saída e restrições do problema de caminhos mínimos entre todos os pares.</li>
+<li>Montar a matriz inicial e dizer o que significam a diagonal e o infinito.</li>
+<li>Narrar a comparação <code>dist[i][k] + dist[k][j] &lt; dist[i][j]</code> apontando para o grafo.</li>
+<li>Justificar a ordem dos laços com a ideia de etapas e com um contraexemplo concreto.</li>
+<li>Reconstruir um caminho a partir da matriz <code>next_vertex</code>.</li>
+<li>Dizer por que o custo é proporcional a n ao cubo e o que acontece com ciclo de peso negativo.</li>
+</ul>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="01-graphs.html"><small>Próxima página →</small>Grafos e caminhos</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

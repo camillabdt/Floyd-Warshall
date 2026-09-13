@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="O código real do projeto com a linha em execução acendendo enquanto a matriz muda.">
+<title>O código do projeto | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html" aria-current="page"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 06 de 08</p><h1>O código do projeto</h1><p class="lead">Esta página mostra o mesmo arquivo que está em src/floyd_warshall/application/floyd_warshall_solver.py, com a linha atual acesa enquanto a animação anda.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="sincronizado">
+<h2>A linha que está rodando agora</h2>
+<p>Avance passo a passo e olhe para o bloco de código. A linha acesa é a que o interpretador executaria naquele momento.
+As linhas em tom mais escuro já foram atravessadas neste mesmo passo.</p>
+<div data-fw-lab
+     data-title="Código e matriz em sincronia"
+     data-badge="Animação"
+     data-sub="Em &quot;Execução completa&quot;, aparecem também os passos em que o código usa continue e pula a conta."
+     data-show="code" data-detail="full"
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1">{FALLBACK}</div>
+</section>
+
+<section id="completo">
+<h2>O arquivo inteiro</h2>
+<div class="code-header"><span>src/floyd_warshall/application/floyd_warshall_solver.py</span></div>
+<pre><code id="solver">class FloydWarshallSolver(ShortestPathSolver):
+    """Implementação própria do algoritmo Floyd-Warshall."""
+
+    def solve(self, graph: Graph) -&gt; ShortestPathResult:
+        vertices = graph.vertices()
+        n = len(vertices)
+        index = {vertex: i for i, vertex in enumerate(vertices)}
+
+        dist = [[inf] * n for _ in range(n)]
+        next_vertex: list[list[int | None]] = [[None] * n for _ in range(n)]
+
+        for i in range(n):
+            dist[i][i] = 0.0
+
+        for origin, destination, weight in graph.edges():
+            i = index[origin]
+            j = index[destination]
+            if weight &lt; dist[i][j]:
+                dist[i][j] = float(weight)
+                next_vertex[i][j] = j
+
+        initial_distances = [row[:] for row in dist]
+
+        for k in range(n):
+            for i in range(n):
+                if dist[i][k] == inf:
+                    continue
+                for j in range(n):
+                    if dist[k][j] == inf:
+                        continue
+                    candidate = dist[i][k] + dist[k][j]
+                    if candidate &lt; dist[i][j]:
+                        dist[i][j] = candidate
+                        next_vertex[i][j] = next_vertex[i][k]
+
+        for i in range(n):
+            if dist[i][i] &lt; 0:
+                raise NegativeCycleError(
+                    f"Ciclo de peso negativo detectado envolvendo '{vertices[i]}'."
+                )
+
+        return ShortestPathResult(
+            vertices=vertices,
+            initial_distances=initial_distances,
+            distances=dist,
+            next_vertex=next_vertex,
+        )</code></pre>
+<button type="button" data-copy="solver">Selecionar o código</button>
+</section>
+
+<section id="decisoes">
+<h2>Quatro decisões que valem explicar na apresentação</h2>
+<h3>O dicionário <code>index</code></h3>
+<p>A matriz é indexada por números, mas os vértices têm nomes como "A" ou "Porto Alegre".
+<code>index</code> traduz nome para posição uma única vez, e <code>vertices</code> traduz de volta na hora de mostrar o resultado.</p>
+
+<h3>Os dois <code>continue</code></h3>
+<p>Se <code>dist[i][k]</code> é infinito, nenhum j vai salvar essa linha: a soma daria infinito de qualquer jeito.
+O primeiro <code>continue</code> pula o laço de j inteiro. Isso não muda o resultado nem a complexidade no pior caso,
+mas evita trabalho inútil em grafos esparsos. Na animação, esses passos aparecem com a mensagem "nem precisa somar".</p>
+
+<h3>A cópia <code>initial_distances</code></h3>
+<p><code>[row[:] for row in dist]</code> guarda uma fotografia da matriz antes do algoritmo começar.
+A interface usa essa cópia para mostrar o antes e o depois. Sem o <code>[:]</code>, as duas listas apontariam
+para as mesmas linhas e a fotografia mudaria junto com o original.</p>
+
+<h3>A verificação final da diagonal</h3>
+<p>Depois dos três laços, o código percorre a diagonal. Se algum <code>dist[i][i]</code> ficou negativo, existe um ciclo
+de peso negativo passando por i, e o resultado perde sentido. O projeto levanta <code>NegativeCycleError</code> em vez de
+devolver números enganosos. O capítulo 07 mostra esse caso animado.</p>
+</section>
+
+<section id="rodar">
+<h2>Rodar no seu computador</h2>
+<pre><code>poetry install
+poetry run pytest -q
+poetry run streamlit run app.py</code></pre>
+<p>Para conferir o mesmo exemplo das animações pela linha de comando:</p>
+<pre><code>poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D</code></pre>
+<p>A resposta esperada é distância 6 pelo caminho A → B → C → D, exatamente o que a animação do capítulo 03 produz.</p>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="05-path-reconstruction.html"><small>← Página anterior</small>Reconstrução do caminho</a><a href="07-testing-presentation.html"><small>Próxima página →</small>Casos difíceis e testes</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="O papel da biblioteca no projeto e uma animação do crescimento cúbico do número de comparações.">
+<title>NetworkX e complexidade | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html" aria-current="page"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 08 de 08</p><h1>NetworkX e complexidade</h1><p class="lead">A biblioteca não resolve o problema por nós. Ela desenha o grafo, calcula posições e fornece um segundo algoritmo para conferir as respostas.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="papel">
+<h2>O que é do projeto e o que é da biblioteca</h2>
+<div class="table-wrap"><table>
+<caption>Divisão de responsabilidades nesta entrega</caption>
+<thead><tr><th>Tarefa</th><th>Quem faz</th><th>Por quê</th></tr></thead>
+<tbody>
+<tr><td>Calcular as distâncias mínimas</td><td>código do grupo</td><td>é o que o enunciado pede implementar</td></tr>
+<tr><td>Reconstruir os caminhos</td><td>código do grupo</td><td>também é pedido explicitamente</td></tr>
+<tr><td>Guardar o grafo e calcular o layout do desenho</td><td>NetworkX</td><td>posicionar vértices na tela não faz parte do problema estudado</td></tr>
+<tr><td>Conferir os resultados</td><td>NetworkX, com Bellman-Ford</td><td>um segundo algoritmo independente detecta erro na implementação própria</td></tr>
+</tbody></table></div>
+<p>A comparação com baseline fica em <code>src/floyd_warshall/application/comparison.py</code>. Ela roda os dois algoritmos
+no mesmo grafo e confere cada par com <code>isclose</code>, que compara números de ponto flutuante com uma tolerância
+em vez de exigir igualdade exata. O resultado aparece na interface como <code>distances_match</code>.</p>
+<div class="note"><span class="note-label">Como responder se perguntarem</span>
+<p>Usar biblioteca para desenhar e para conferir é diferente de usar biblioteca para resolver.
+O algoritmo pedido está implementado no projeto, em <code>floyd_warshall_solver.py</code>, e o baseline existe justamente
+para provar que ele está certo.</p></div>
+</section>
+
+<section id="complexidade">
+<h2>Por que o custo é n ao cubo</h2>
+<p>São três laços aninhados, cada um percorrendo os n vértices. O corpo do laço mais interno faz uma soma e uma comparação,
+que custam o mesmo independentemente do tamanho do grafo. Logo, o número de comparações é exatamente n × n × n.</p>
+<div data-bars-lab
+     data-title="Comparações executadas conforme o grafo cresce"
+     data-badge="Animação"
+     data-sub="Os tamanhos são os mesmos que o experimento do projeto usa. Cada barra é oito vezes a anterior, porque o tamanho dobra a cada passo."
+     data-sizes="10,20,40,80">
+<div class="no-js">Sem JavaScript: 10 vértices geram 1.000 comparações; 20 geram 8.000; 40 geram 64.000; 80 geram 512.000.</div></div>
+<p>Dobrar o número de vértices multiplica o trabalho por oito, porque 2 elevado a 3 é 8.
+A memória cresce com n ao quadrado, que são as duas matrizes guardadas.</p>
+<div class="note"><span class="note-label">Por que o problema está na classe P</span>
+<p>A classe P reúne os problemas que uma máquina determinística resolve em tempo limitado por um polinômio no tamanho da entrada.
+O Floyd-Warshall termina em um número de passos proporcional a n ao cubo, que é um polinômio, para qualquer entrada válida.
+Isso basta para colocar o problema de caminhos mínimos entre todos os pares na classe P.</p></div>
+</section>
+
+<section id="medicao">
+<h2>Medir em vez de supor</h2>
+<p>O projeto traz um experimento em <code>benchmark</code>, no mesmo arquivo da comparação. Ele monta grafos completos
+determinísticos de tamanhos crescentes, roda o algoritmo algumas vezes e guarda a <strong>mediana</strong> dos tempos.</p>
+<p>Duas decisões do experimento valem explicar:</p>
+<ul>
+<li><strong>Aquecimento.</strong> A primeira execução é descartada, porque ela paga custos que não se repetem, como a alocação inicial de memória.</li>
+<li><strong>Mediana, não média.</strong> Se o sistema operacional interromper uma das medições, a média sobe; a mediana ignora esse caso isolado.</li>
+</ul>
+<p>A coluna <code>ms_per_n3</code> divide o tempo medido por n ao cubo. Se a teoria descreve bem a prática, essa coluna
+fica aproximadamente constante conforme n cresce. É essa a evidência que sustenta a afirmação de complexidade,
+melhor do que só repetir a fórmula.</p>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Para 100 vértices, quantas comparações o algoritmo faz? E para 200?</summary>
+<div class="answer"><p>1.000.000 para 100 vértices e 8.000.000 para 200. O tamanho dobrou, o trabalho ficou oito vezes maior.</p></div></details>
+<details><summary>Se o grafo tem poucas arestas, o algoritmo fica mais rápido?</summary>
+<div class="answer"><p>Os três laços percorrem vértices, não arestas, então o número de repetições não muda.
+Os dois <code>continue</code> economizam contas em grafos esparsos, mas a complexidade no pior caso continua sendo n ao cubo.
+Para grafos muito esparsos, rodar Dijkstra a partir de cada vértice costuma sair mais barato, desde que não haja peso negativo.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="07-testing-presentation.html"><small>← Página anterior</small>Casos difíceis e testes</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

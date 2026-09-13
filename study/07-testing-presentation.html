@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Pares sem caminho, pesos negativos e ciclo de peso negativo, cada um com sua animação e com o teste correspondente.">
+<title>Casos difíceis e testes | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html" aria-current="page"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 07 de 08</p><h1>Casos difíceis e testes</h1><p class="lead">Um algoritmo correto no exemplo bonito pode falhar no caso estranho. Estes três casos são os que a banca costuma perguntar, e todos têm dataset próprio no projeto.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="sem-caminho">
+<h2>Caso 1: par sem caminho</h2>
+<p>O dataset <code>grafo_desconexo.json</code> declara o vértice Z sem nenhuma aresta. Escolha origem A e destino Z
+na animação e veja o que a matriz de placas responde.</p>
+<div data-path-lab
+     data-title="Um vértice que ninguém alcança"
+     data-badge="Animação"
+     data-sub="Baseado em datasets/grafo_desconexo.json, com o vértice isolado Z."
+     data-vertices="A@100,80 B@320,80 C@320,280 D@100,280 Z@520,180"
+     data-edges="A>B:3 B>C:2 C>D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<p>A célula guarda ∅, que no código é <code>None</code>, e a distância permanece infinita. A função de reconstrução
+devolve lista vazia. Na interface do projeto, esses pares entram na métrica <code>unreachable_pairs</code>.
+<strong>Infinito no fim da execução é uma resposta válida</strong>, não um erro.</p>
+</section>
+
+<section id="peso-negativo">
+<h2>Caso 2: peso negativo sem ciclo negativo</h2>
+<p>Peso negativo é permitido. Ele aparece quando a aresta representa um ganho, como um trecho que gera crédito
+ou recupera tempo. O dataset <code>grafo_peso_negativo.json</code> tem A → B com 4, A → C com 5 e B → C com −2.</p>
+<div data-fw-lab
+     data-title="A aresta de peso −2 encurtando o caminho"
+     data-badge="Animação"
+     data-sub="Três vértices, execução curta. Acompanhe a etapa k = B, em que a soma 4 + (−2) vence a aresta direta."
+     data-vertices="A@110,90 B@370,90 C@240,300"
+     data-edges="A>B:4 A>C:5 B>C:-2"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<p>Na etapa k = B, o par A → C compara o 5 da aresta direta com 4 + (−2) = 2 e fica com 2.
+Esse é o motivo de o Dijkstra não servir aqui: ele supõe que estender um caminho nunca barateia, e com peso negativo isso deixa de valer.
+O Floyd-Warshall não faz essa suposição.</p>
+</section>
+
+<section id="ciclo-negativo">
+<h2>Caso 3: ciclo de peso negativo</h2>
+<p>O dataset <code>grafo_ciclo_negativo.json</code> fecha um ciclo A → B → C → A somando 1 + (−3) + 1 = −1.
+Cada volta no ciclo deixa a viagem mais barata, então <strong>não existe caminho mínimo</strong>: sempre dá para dar mais uma volta.</p>
+<div data-fw-lab
+     data-title="A diagonal ficando negativa"
+     data-badge="Animação"
+     data-sub="As células da diagonal, de um vértice para ele mesmo, deveriam permanecer em 0. Quando ficam negativas, aparecem contornadas em laranja."
+     data-vertices="A@120,90 B@360,90 C@240,300"
+     data-edges="A>B:1 B>C:-3 C>A:1"
+     data-done-caption="Estes números não são distâncias mínimas"
+     data-done-formula="Diagonal negativa: o projeto recusa esta entrada."
+     data-done-head="Fim da execução, com um alerta"
+     data-done-tone="keep"
+     data-done-text="As três células da diagonal ficaram negativas. Isso prova que existe um ciclo de peso negativo. Os outros números desta matriz não são distâncias mínimas, porque distâncias mínimas não existem neste grafo."><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<div class="note caution"><span class="note-label">Leia esta animação com cuidado</span>
+<p>Os números que ela produz depois da diagonal ficar negativa <strong>não são distâncias mínimas</strong>, porque elas não existem
+neste grafo. A animação serve para uma coisa só: mostrar que a diagonal escapa do zero, que é justamente o sinal
+que o projeto usa para recusar a entrada.</p></div>
+<p>Por isso a verificação final do código olha para <code>dist[i][i] &lt; 0</code>. Sair do zero na diagonal significa
+que existe uma volta com custo negativo passando por i. O projeto levanta <code>NegativeCycleError</code> e a interface
+mostra uma mensagem explicativa, sem produzir relatório de caminhos.</p>
+</section>
+
+<section id="testes">
+<h2>O que testar e com qual resultado</h2>
+<div class="table-wrap"><table>
+<caption>Casos mínimos para a defesa do trabalho</caption>
+<thead><tr><th>Dataset</th><th>Consulta</th><th>Resultado esperado</th></tr></thead>
+<tbody>
+<tr><td><code>grafo_exemplo.csv</code></td><td>A → D</td><td>distância 6, caminho A → B → C → D</td></tr>
+<tr><td><code>grafo_desconexo.json</code></td><td>A → Z</td><td>sem caminho, distância infinita</td></tr>
+<tr><td><code>grafo_peso_negativo.json</code></td><td>A → C</td><td>distância 2, caminho A → B → C</td></tr>
+<tr><td><code>grafo_ciclo_negativo.json</code></td><td>qualquer</td><td>execução recusada com mensagem de ciclo negativo</td></tr>
+<tr><td><code>grafo_reciproco.csv</code></td><td>A → B e B → A</td><td>valores diferentes, porque o grafo é dirigido</td></tr>
+</tbody></table></div>
+<pre><code>poetry run pytest -q</code></pre>
+<p>Rode a bateria inteira antes de apresentar, não só o teste novo. Uma mudança em um módulo pode quebrar outro.</p>
+</section>
+
+<section id="roteiro">
+<h2>Roteiro curto de apresentação</h2>
+<ol>
+<li>Enuncie o problema: instância, entrada, saída e a restrição de ciclo negativo.</li>
+<li>Mostre o grafo e as duas rotas de A até D, 10 contra 6 (capítulo 01).</li>
+<li>Mostre a matriz inicial e explique diagonal e infinito (capítulo 02).</li>
+<li>Rode a animação principal e narre as três melhorias (capítulo 03).</li>
+<li>Apresente o contraexemplo da ordem dos laços (capítulo 04). É pedido explicitamente no enunciado.</li>
+<li>Reconstrua A → D seguindo as placas (capítulo 05). Também é pedido explicitamente.</li>
+<li>Mostre os três casos difíceis desta página e a comparação com o baseline.</li>
+<li>Feche com a complexidade n ao cubo e a justificativa de pertencer à classe P (capítulo 08).</li>
+</ol>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="06-python-implementation.html"><small>← Página anterior</small>O código do projeto</a><a href="08-networkx.html"><small>Próxima página →</small>NetworkX e complexidade</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

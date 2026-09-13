@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Duas execuções lado a lado mostram o que quebra quando o laço do vértice intermediário sai da posição externa.">
+<title>Por que k fica por fora | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html" aria-current="page"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 04 de 08</p><h1>Por que k fica por fora</h1><p class="lead">O enunciado pede essa justificativa. A resposta curta: cada etapa k precisa terminar para todos os pares antes que a próxima comece, porque a etapa seguinte usa os resultados da anterior.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="invariante">
+<h2>Cada etapa libera uma parada a mais</h2>
+<p>Pense em um jogo com regras que vão afrouxando. Na rodada 1, você só pode usar a cidade A como parada.
+Na rodada 2, A e B. Na rodada 3, A, B e C. A cada rodada você recalcula o preço de <strong>todos</strong> os pares
+com a regra da vez, e só depois passa para a próxima rodada.</p>
+<div class="table-wrap"><table>
+<caption>O que está garantido ao fim de cada etapa</caption>
+<thead><tr><th>Momento</th><th>Paradas permitidas no meio do caminho</th></tr></thead>
+<tbody>
+<tr><td>Inicialização</td><td>nenhuma: só arestas diretas e o custo zero da diagonal</td></tr>
+<tr><td>Depois de k = A</td><td>A</td></tr>
+<tr><td>Depois de k = B</td><td>A e B</td></tr>
+<tr><td>Depois de k = C</td><td>A, B e C</td></tr>
+<tr><td>Depois de k = D</td><td>A, B, C e D, ou seja, qualquer parada</td></tr>
+</tbody></table></div>
+<p>Essa afirmação que se mantém verdadeira de etapa em etapa tem nome: <strong>invariante</strong>.
+Ela é o que permite justificar o algoritmo em vez de confiar em exemplos que deram certo.</p>
+<div class="note"><span class="note-label">Por que a comparação basta</span>
+<p>Suponha as etapas anteriores corretas e libere k. O melhor caminho de i a j ou <strong>não passa por k</strong>,
+e então já está em <code>dist[i][j]</code>, ou <strong>passa por k</strong>, e então se parte em i → k e k → j,
+dois trechos que só usam paradas antigas e já têm o melhor valor anotado. Ficar com o menor dos dois cobre os dois casos.</p></div>
+</section>
+
+<section id="contraexemplo">
+<h2>Um contraexemplo que você pode mostrar na apresentação</h2>
+<p>Trocamos de grafo. Aqui A → B custa 10, mas o desvio A → D → C → B custa 3. As duas execuções abaixo usam
+exatamente as mesmas comparações, na mesma quantidade. Só muda a ordem em que os laços giram.</p>
+<div data-versus-lab
+     data-title="k por fora contra k por dentro"
+     data-badge="Animação comparativa"
+     data-sub="A célula observada é A → B. Use 'Ir ao final' para ver o desfecho e depois volte e acompanhe devagar."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290"
+     data-edges="A>B:10 A>D:1 D>C:1 C>B:1"
+     data-watch="A>B" data-route="A>D>C>B">
+<div class="no-js">Esta animação precisa de JavaScript. Sem ela: com k por fora, A → B termina em 3; com k no laço mais interno e uma única passagem, termina em 10.</div></div>
+<p>O que acontece na versão errada: o programa começa em i = A e chega a j = B <strong>antes</strong> de saber que
+A → D → C custa 2. Ele testa as paradas disponíveis, não encontra nada melhor que 10 e segue em frente.
+Logo depois descobre A → C = 2, mas a célula A → B já ficou para trás e não é revisitada nessa passagem.</p>
+<div class="note caution"><span class="note-label">Como enunciar isso corretamente</span>
+<p>A ordem i, j, k acerta em muitos grafos. O problema não é errar sempre, é <strong>não garantir</strong> o resultado
+para toda entrada válida. Um algoritmo precisa da garantia, não da sorte.</p></div>
+</section>
+
+<section id="mesma-matriz">
+<h2>Por que uma matriz só é suficiente</h2>
+<p>A fórmula por etapas fala em matriz anterior e matriz seguinte:</p>
+<div class="formula-live"><span class="t">D<sub>depois</sub>[i][j]</span> = min( <span class="t">D<sub>antes</sub>[i][j]</span>, <span class="a">D<sub>antes</sub>[i][k]</span> + <span class="b">D<sub>antes</sub>[k][j]</span> )</div>
+<p>O código usa uma matriz só, escrevendo por cima. Isso funciona porque, sem ciclo negativo, <code>dist[k][k]</code> vale 0.
+Durante a etapa k, tentar melhorar um trecho que termina em k daria <code>dist[i][k] + 0</code>, o mesmo valor de antes.
+A linha k e a coluna k, que são justamente as usadas nas somas, <strong>não mudam durante a própria etapa k</strong>.
+Por isso ler valores já atualizados no mesmo passo não estraga a conta.</p>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Alguém sugere trocar a ordem para k, j, i. Isso quebra o algoritmo?</summary>
+<div class="answer"><p>Não. O que importa é que k seja o laço mais externo. Os laços de i e j podem vir em qualquer ordem entre si,
+porque dentro de uma etapa k eles só percorrem todos os pares, sem depender um do outro.</p></div></details>
+<details><summary>E se rodarmos a ordem errada n vezes seguidas?</summary>
+<div class="answer"><p>Repetir a passagem acaba propagando as informações e o resultado converge, mas o custo sobe de n ao cubo
+para algo maior e a justificativa por etapas se perde. É um remendo, não o algoritmo de Floyd-Warshall.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="03-floyd-warshall.html"><small>← Página anterior</small>O algoritmo, passo a passo</a><a href="05-path-reconstruction.html"><small>Próxima página →</small>Reconstrução do caminho</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A matriz next_vertex sendo preenchida e depois percorrida, transformando um custo mínimo em uma lista de vértices.">
+<title>Reconstrução do caminho | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html" aria-current="page"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 05 de 08</p><h1>Reconstrução do caminho</h1><p class="lead">Saber que a viagem custa 6 não diz por onde passar. A segunda matriz guarda, para cada par, apenas a próxima parada, e isso é suficiente para montar o caminho inteiro.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="ideia">
+<h2>Guarde só o primeiro passo</h2>
+<p>Imagine placas de estrada. Nenhuma placa desenha o trajeto inteiro; ela só diz para onde virar agora.
+Chegando na próxima cidade, outra placa diz o passo seguinte. Seguindo placa por placa você chega ao destino.</p>
+<p><code>next_vertex[i][j]</code> é essa placa: <strong>o primeiro vértice a visitar depois de i, no caminho escolhido até j</strong>.
+Se o caminho de A até D é A → B → C → D, então <code>next_vertex[A][D]</code> vale B, mesmo com o destino três arestas adiante.</p>
+<div class="table-wrap"><table>
+<caption>Valor inicial da placa, junto com a distância inicial</caption>
+<thead><tr><th>Situação</th><th>Distância</th><th>Próximo vértice</th></tr></thead>
+<tbody>
+<tr><td>i igual a j</td><td>0</td><td>o próprio i</td></tr>
+<tr><td>existe aresta i → j</td><td>peso da aresta</td><td>j</td></tr>
+<tr><td>sem aresta direta</td><td>∞</td><td><code>None</code>, mostrado como ∅</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="atualizacao">
+<h2>Quando a distância melhora, a placa também muda</h2>
+<p>A linha que faz isso no projeto é curta e é a parte que mais gera dúvida:</p>
+<pre><code>if candidate &lt; dist[i][j]:
+    dist[i][j] = candidate
+    next_vertex[i][j] = next_vertex[i][k]</code></pre>
+<p>A placa nova <strong>não</strong> aponta para k. Ela copia a placa que já existia para chegar em k.
+Motivo: o caminho novo começa fazendo o trecho i → k, então o primeiro passo dele é o primeiro passo desse trecho.
+Na etapa k = C, o par A → D melhora usando A → C → D, mas A → C já significava A → B → C. Por isso a placa recebe B, não C.</p>
+<p>Acompanhe as duas matrizes sendo preenchidas juntas. A de baixo é a das placas.</p>
+<div data-fw-lab
+     data-title="Distâncias e placas, lado a lado"
+     data-badge="Animação"
+     data-sub="Observe a célula A, D na segunda matriz durante a etapa k = C: ela recebe B, e não C."
+     data-show="next" data-detail="wins"
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<div class="note caution"><span class="note-label">Use melhora estrita</span>
+<p>Mantenha <code>&lt;</code> e não <code>&lt;=</code>. Em empate, preservar a placa antiga evita trocar um caminho válido
+por outro de mesmo custo e, em certos empates envolvendo a diagonal, evita criar uma placa que aponta para a própria origem
+e deixa a reconstrução presa em um laço.</p></div>
+</section>
+
+<section id="percorrer">
+<h2>Siga as placas até o destino</h2>
+<p>Escolha origem e destino e avance um vértice por vez. A célula em destaque é a consulta que está sendo feita.
+Repare que <strong>a coluna consultada é sempre a do destino</strong>; só a linha muda conforme você anda.</p>
+<div data-path-lab
+     data-title="Reconstrução guiada por next_vertex"
+     data-badge="Animação"
+     data-sub="Experimente também D → A, um par sem caminho, para ver o que a função devolve nesse caso."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<pre><code>def reconstruct_path(source, target, next_vertex):
+    if next_vertex[source][target] is None:
+        return []
+    path = [source]
+    current = source
+    while current != target:
+        current = next_vertex[current][target]
+        path.append(current)
+    return path</code></pre>
+<p>Se não há caminho, a função devolve a lista vazia <code>[]</code>. Se origem e destino são iguais, o laço não executa
+nenhuma vez e a resposta é a lista com um único vértice.</p>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Você está em B e quer chegar a D. Consulta a célula B, C ou a célula B, D?</summary>
+<div class="answer"><p>B, D. O destino continua sendo D; o que mudou foi a sua posição atual. Essa célula guarda C,
+que é a próxima parada. Depois de chegar em C, a consulta é C, D.</p></div></details>
+<details><summary>Outra fonte usa uma matriz de predecessores. É a mesma coisa?</summary>
+<div class="answer"><p>É a ideia espelhada. Predecessor guarda quem vem imediatamente antes, e o caminho é montado de trás para frente,
+do destino até a origem, invertendo a lista no fim. Este material usa o próximo vértice porque a reconstrução sai na ordem
+em que se anda.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="04-loop-order.html"><small>← Página anterior</small>Por que k fica por fora</a><a href="06-python-implementation.html"><small>Próxima página →</small>O código do projeto</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>

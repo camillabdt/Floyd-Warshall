@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Vértices, arestas, pesos e custo de um caminho, com uma animação que percorre cada rota somando o preço.">
+<title>Grafos e caminhos | Floyd-Warshall</title>
+<link rel="stylesheet" href="assets/study.css">
+<script src="assets/fw.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#content">Ir para o conteúdo</a>
+<header class="topbar">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f/w</span><span>Floyd-Warshall</span></a>
+<span class="top-note">Teoria da Computação · Caderno animado</span>
+<button type="button" data-print>Imprimir página</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="Páginas do material"><p class="eyebrow">Percurso</p><ol><li><a href="index.html"><span class="nav-number">00</span><span>Comece aqui</span></a></li><li><a href="01-graphs.html" aria-current="page"><span class="nav-number">01</span><span>Grafos e caminhos</span></a></li><li><a href="02-distance-matrix.html"><span class="nav-number">02</span><span>A matriz de distâncias</span></a></li><li><a href="03-floyd-warshall.html"><span class="nav-number">03</span><span>O algoritmo, passo a passo</span></a></li><li><a href="04-loop-order.html"><span class="nav-number">04</span><span>Por que k fica por fora</span></a></li><li><a href="05-path-reconstruction.html"><span class="nav-number">05</span><span>Reconstrução do caminho</span></a></li><li><a href="06-python-implementation.html"><span class="nav-number">06</span><span>O código do projeto</span></a></li><li><a href="07-testing-presentation.html"><span class="nav-number">07</span><span>Casos difíceis e testes</span></a></li><li><a href="08-networkx.html"><span class="nav-number">08</span><span>NetworkX e complexidade</span></a></li><li><a href="simulacao.html" class="nav-sim"><span class="nav-number">▶</span><span>Simulação</span></a></li></ol><p class="sidebar-note">Um grafo de quatro vértices acompanha todo o caderno.<br>Use as setas do teclado dentro de uma animação para andar passo a passo.</p></nav>
+<main id="content">
+<div class="hero"><p class="eyebrow">Capítulo 01 de 08</p><h1>Grafos e caminhos</h1><p class="lead">Antes de falar em algoritmo, é preciso ter clareza sobre três coisas: o que é uma aresta, o que é um caminho e quanto um caminho custa.</p><div class="meta-line"><span class="tag">Animação interativa</span><span class="tag">Funciona sem internet</span></div></div>
+
+<section id="vocabulario">
+<h2>Três palavras, um desenho</h2>
+<p>Imagine um mapa de cidades ligadas por estradas de mão única. Cada cidade é um <strong>vértice</strong>.
+Cada estrada é uma <strong>aresta</strong>. O número escrito na estrada é o <strong>peso</strong>: pode ser quilômetros,
+minutos ou reais de pedágio. O algoritmo não se importa com a unidade, só com o número.</p>
+<p>Um <strong>caminho</strong> é uma sequência de cidades em que cada passo usa uma estrada existente e respeita o sentido da seta.
+O <strong>custo do caminho</strong> é a soma dos pesos das estradas usadas.</p>
+<div class="note"><span class="note-label">Dirigido quer dizer mão única</span>
+<p>No nosso grafo existe a aresta A → B com peso 3. Isso não cria a aresta B → A. Se o problema precisar dos dois sentidos,
+o arquivo de entrada precisa declarar as duas linhas. Por isso a matriz de distâncias quase nunca é simétrica.</p></div>
+</section>
+
+<section id="percorrer">
+<h2>Percorra uma rota e some o preço</h2>
+<p>Clique em uma rota. A animação avança uma aresta por vez, acende a estrada usada e mostra o total acumulado.
+Compare as duas rotas que ligam A a D.</p>
+<div data-walk-lab
+     data-title="Quanto custa cada rota de A até D"
+     data-badge="Animação"
+     data-sub="O grafo é o mesmo de datasets/grafo_exemplo.csv, usado na demonstração do projeto."
+     data-vertices="A@110,80 B@390,80 C@390,290 D@110,290" data-edges="A&gt;B:3 A&gt;D:10 B&gt;C:2 C&gt;D:1"
+     data-routes="A>D; A>B>C>D; A>B>C"><div class="no-js">Esta animação precisa de JavaScript. Com ele desligado, use o texto e as tabelas desta página, que contêm os mesmos números.</div></div>
+<p>A rota direta A → D existe e custa 10. A rota A → B → C → D dá mais voltas no desenho, mas soma 3 + 2 + 1 = 6.
+<strong>Menos arestas não significa menor custo.</strong> É o peso que decide, não a quantidade de saltos.</p>
+</section>
+
+<section id="todos-os-pares">
+<h2>Por que "todos os pares" é um problema diferente</h2>
+<p>Existe uma família de algoritmos que responde a partir de <em>uma</em> origem fixa, como o Dijkstra e o Bellman-Ford.
+Nosso enunciado pede outra coisa: a distância de <strong>toda origem para todo destino</strong>.</p>
+<p>Com 4 vértices, isso são 4 × 4 = 16 respostas, contando a diagonal de cada vértice para ele mesmo.
+Com 100 vértices, 10.000 respostas. Guardar tantas respostas pede uma estrutura que combine bem com esse formato,
+e é exatamente a matriz que o próximo capítulo apresenta.</p>
+<div class="note"><span class="note-label">Instância, entrada, saída, restrição</span>
+<p><strong>Instância:</strong> um grafo dirigido e ponderado específico.
+<strong>Entrada:</strong> a lista de vértices e de arestas com pesos.
+<strong>Saída:</strong> a menor distância para cada par ordenado de vértices.
+<strong>Restrição:</strong> não pode haver ciclo de peso negativo, porque nele a distância mínima deixa de existir.</p></div>
+</section>
+
+<section id="pratica">
+<h2>Confira o entendimento</h2>
+<details><summary>Quantas rotas diferentes, sem repetir vértice, ligam A a D neste grafo? Qual é a mais barata?</summary>
+<div class="answer"><p>Duas: a aresta direta A → D, que custa 10, e A → B → C → D, que custa 6. A mais barata é a segunda.</p></div></details>
+<details><summary>Existe algum caminho de D até A neste grafo?</summary>
+<div class="answer"><p>Não. Nenhuma aresta sai de D. Como o grafo é dirigido, a célula de D para A ficará marcada com infinito na matriz,
+indicando ausência de caminho.</p></div></details>
+</section>
+
+<nav class="next-nav" aria-label="Navegação entre capítulos"><a href="index.html"><small>← Página anterior</small>Comece aqui</a><a href="02-distance-matrix.html"><small>Próxima página →</small>A matriz de distâncias</a></nav>
+<footer>Floyd-Warshall · grafo dirigido com pesos e sem ciclo de peso negativo · as animações usam o mesmo grafo de <code>datasets/grafo_exemplo.csv</code>.</footer>
+</main>
+</div>
+</body>
+</html>
