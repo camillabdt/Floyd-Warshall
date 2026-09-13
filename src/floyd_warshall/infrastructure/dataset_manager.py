@@ -32,13 +32,11 @@ class DatasetManager:
         self.base_dir = Path(base_dir)
         self.graph_factory = graph_factory
 
-        self.base_dir.mkdir(
-            parents=True,
-            exist_ok=True,
-        )
-
     def list_datasets(self) -> list[str]:
-        """Lista os datasets disponíveis."""
+        """Lista os datasets disponíveis; pasta ausente equivale a lista vazia."""
+
+        if not self.base_dir.is_dir():
+            return []
 
         return sorted(
             path.name
@@ -67,6 +65,7 @@ class DatasetManager:
             content,
         )
 
+        self.base_dir.mkdir(parents=True, exist_ok=True)
         destination = self.base_dir / safe_name
         destination.write_bytes(content)
 

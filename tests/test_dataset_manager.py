@@ -48,3 +48,12 @@ def test_invalid_save_does_not_write(manager):
     with pytest.raises(ValueError):
         manager.save("bad.csv", b"wrong,header\n")
     assert manager.list_datasets() == []
+
+
+def test_constructor_does_not_create_directory(tmp_path):
+    target = tmp_path / "novo"
+    manager = DatasetManager(target, NetworkXGraph)
+    assert not target.exists()
+    assert manager.list_datasets() == []
+    manager.save("a.json", b'{"vertices":["A"],"edges":[]}')
+    assert target.is_dir()
