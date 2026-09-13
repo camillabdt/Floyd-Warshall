@@ -17,7 +17,8 @@ def main():
         if name.startswith("rede_") and name.endswith(".json"):
             graph = manager.load(name)
             comparison = compare(graph, FloydWarshallSolver(), BellmanFordSolver())
-            assert comparison["distances_match"], name
+            if not comparison["distances_match"]:
+                raise RuntimeError(f"Distâncias divergem do baseline em {name}.")
             result = FloydWarshallSolver().solve(graph)
             row = {
                 "dataset": name,

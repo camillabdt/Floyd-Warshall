@@ -22,8 +22,10 @@ def main():
     g = DatasetManager(settings.datasets_dir, NetworkXGraph).load("grafo_exemplo.csv")
     e = EvaluationService(FloydWarshallSolver()).evaluate(g)
     comparison = compare(g, FloydWarshallSolver(), BellmanFordSolver())
-    assert comparison["distances_match"]
-    assert e.result.distance("A", "D") == 6
+    if not comparison["distances_match"]:
+        raise RuntimeError("Distâncias divergem do baseline em grafo_exemplo.csv.")
+    if e.result.distance("A", "D") != 6:
+        raise RuntimeError("Distância A -> D deveria ser 6 em grafo_exemplo.csv.")
     exporter = ReportExporter()
     (reports / "relatorio_exemplo.json").write_text(
         exporter.to_json("grafo_exemplo.csv", g, e, comparison)

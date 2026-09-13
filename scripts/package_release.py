@@ -26,7 +26,9 @@ def main():
         for path in files + [manifest]:
             archive.write(path, Path(root.name) / path.relative_to(root))
     with ZipFile(output) as archive:
-        assert archive.testzip() is None
+        corrupted = archive.testzip()
+        if corrupted is not None:
+            raise RuntimeError(f"Arquivo corrompido no ZIP: {corrupted}")
     output.with_suffix(".zip.sha256").write_text(
         f"{sha256(output.read_bytes()).hexdigest()}  {output.name}\n"
     )
