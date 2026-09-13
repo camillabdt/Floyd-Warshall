@@ -22,6 +22,7 @@
   <a href="#entregáveis">Entregáveis</a> ·
   <a href="#tecnologias">Tecnologias</a> ·
   <a href="#executar">Como executar</a> ·
+  <a href="#simulação-do-algoritmo">Simulação</a> ·
   <a href="#demonstração-rápida">Demonstração</a> ·
   <a href="#algoritmo-e-complexidade">Algoritmo</a> ·
   <a href="#documentação">Documentação</a>
@@ -85,6 +86,14 @@ A biblioteca também pode ser usada pela linha de comando:
 poetry run floyd-warshall datasets/grafo_exemplo.csv --origem A --destino D
 poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D
 ```
+
+## Simulação do algoritmo
+
+O vídeo em [docs/funcionamento-algoritmo.webm](docs/funcionamento-algoritmo.webm) é uma simulação do funcionamento do algoritmo Floyd-Warshall.
+
+<!-- Para o player aparecer aqui, arraste docs/funcionamento-algoritmo.webm no editor do README no GitHub e substitua o link abaixo pelo endereço gerado. -->
+
+[![Simulação do Floyd-Warshall (vídeo, 2,8 MB)](https://img.shields.io/badge/%E2%96%B6%20assistir-simula%C3%A7%C3%A3o%20do%20algoritmo-153e58?style=for-the-badge)](docs/funcionamento-algoritmo.webm)
 
 ## Demonstração rápida
 
