@@ -15,6 +15,10 @@ from floyd_warshall.infrastructure.networkx_graph import NetworkXGraph
 from floyd_warshall.infrastructure.plotly_graph_visualizer import PlotlyGraphVisualizer
 from floyd_warshall.infrastructure.report_exporter import ReportExporter
 
+# Limites da interface; a biblioteca e a CLI não os impõem.
+MAX_VERTICES_ANALYSIS = 200
+MAX_VERTICES_DRAWING = 50
+
 
 def run():
     st.set_page_config(page_title="Floyd-Warshall • Laboratório", page_icon="🧭", layout="wide")
@@ -64,9 +68,9 @@ def run():
     with st.expander("Dados de entrada"):
         st.write("Vértices:", graph.vertices())
         st.dataframe(pd.DataFrame(graph.edges(), columns=["source", "target", "weight"]))
-    if len(graph.vertices()) > 200:
+    if len(graph.vertices()) > MAX_VERTICES_ANALYSIS:
         st.warning(
-            "Esta interface aceita até 200 vértices por análise. Use a biblioteca para estudos maiores."
+            f"Esta interface aceita até {MAX_VERTICES_ANALYSIS} vértices por análise. Use a biblioteca para estudos maiores."
         )
         return
     if st.button("Executar análise", type="primary"):
@@ -81,7 +85,7 @@ def run():
             st.error(str(exc))
             return
     if "evaluation" not in st.session_state:
-        if len(graph.vertices()) <= 50:
+        if len(graph.vertices()) <= MAX_VERTICES_DRAWING:
             st.plotly_chart(PlotlyGraphVisualizer().create(graph))
         return
     evaluation = st.session_state.evaluation
@@ -99,11 +103,11 @@ def run():
         else:
             st.metric("Distância mínima", f"{result.distance(origin, destination):g}")
             st.write(" → ".join(path))
-        if len(result.vertices) <= 50:
+        if len(result.vertices) <= MAX_VERTICES_DRAWING:
             st.plotly_chart(PlotlyGraphVisualizer().create(graph, highlighted_path=path))
         else:
             st.info(
-                "Para redes acima de 50 vértices, o desenho mostra apenas o caminho consultado. Matrizes e relatórios abrangem a rede completa."
+                f"Para redes acima de {MAX_VERTICES_DRAWING} vértices, o desenho mostra apenas o caminho consultado. Matrizes e relatórios abrangem a rede completa."
             )
             if path:
                 route_graph = NetworkXGraph()
