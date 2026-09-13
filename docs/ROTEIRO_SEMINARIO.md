@@ -28,7 +28,7 @@ Troque para `grafo_desconexo.json`; os resultados anteriores são descartados. E
 
 Clique em comparar. A comparação confere todos os pares com tolerância numérica, não exige caminhos idênticos em empates. Bellman-Ford foi escolhido porque aceita pesos negativos.
 
-Floyd-Warshall: O(V³) em tempo e O(V²) em espaço. Bellman-Ford por origem: O(VE); para V origens, O(V²E). Execute o experimento de 10 a 80 vértices. Diga que mediana e aquecimento reduzem ruído, mas quatro tamanhos não provam uma lei assintótica nem uma vantagem universal.
+Floyd-Warshall: O(V³) em tempo e O(V²) em espaço. Bellman-Ford por origem: O(VE); para V origens, O(V²E). Execute o experimento de 10 a 320 vértices (o último tamanho leva alguns segundos). Aponte as colunas de razão e inclinação log-log: se o tempo fosse c·V³, dobrar V multiplicaria o tempo por 8 e a inclinação seria 3; os valores medidos se aproximam de 8 e 3 conforme V cresce. Diga que mediana e aquecimento reduzem ruído, mas medições não provam uma lei assintótica nem uma vantagem universal: quem prova O(V³) é a contagem dos três laços.
 
 ## 10–12 min — Engenharia e entrega
 

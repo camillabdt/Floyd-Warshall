@@ -26,7 +26,7 @@ As quatro redes maiores também foram verificadas em todos os pares. Resultados 
 
 Esses tempos incluem a preparação interna de cada solver, excluem a leitura do dataset e não são médias de múltiplas execuções. Não estabelecem superioridade geral. Dados completos: `reports/comparacao_redes.csv`.
 
-O experimento separado de grafos completos, com aquecimento e mediana de três execuções, registrou aproximadamente 0,11; 0,66; 4,64 e 34,99 ms para 10, 20, 40 e 80 vértices na execução de 13/09/2026 que gerou o relatório final. Fonte: `reports/complexidade.csv`. A variação de tempo normalizado por V³ mostra a influência de overhead, cache, dados e ambiente; a complexidade é fundamentada na análise dos laços, não ajustada a esses quatro pontos.
+O experimento separado de grafos completos, com aquecimento e mediana de três execuções, registrou aproximadamente 0,13; 0,84; 5,93; 44,85; 351,57 e 2.829,37 ms para 10, 20, 40, 80, 160 e 320 vértices na execução de 13/09/2026 que gerou o relatório final. Fonte: `reports/complexidade.csv`. A razão entre medianas de tamanhos vizinhos foi 6,69; 7,04; 7,56; 7,84 e 8,05, e a inclinação log-log correspondente 2,74; 2,82; 2,92; 2,97 e 3,01. Sob tempo = c·V³, dobrar V multiplica o tempo por 8 e a inclinação vale 3; a aproximação desses valores conforme V cresce é coerente com um custo fixo por execução que pesa nos grafos pequenos. Seis pontos verificam a implementação, mas a complexidade é fundamentada na análise dos laços, não ajustada às medições.
 
 ## Limites da validação
 

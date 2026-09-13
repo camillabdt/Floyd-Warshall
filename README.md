@@ -49,7 +49,7 @@ Cada funcionalidade esperada no seminário tem um lugar na aplicação e uma evi
 | Visualização de resultados       | Desenho interativo do grafo com o caminho consultado em destaque.                                                              | [grafo_exemplo.html](reports/grafo_exemplo.html)                                                            |
 | Exportação de relatórios         | Aba **Relatórios**: download em JSON, CSV e HTML.                                                                              | [relatorio_final.html](reports/relatorio_final.html) e [caminhos_exemplo.csv](reports/caminhos_exemplo.csv) |
 | Bônus: comparação com baseline   | Aba **Baseline**: Bellman-Ford do NetworkX para cada origem.                                                                   | [comparacao_redes.csv](reports/comparacao_redes.csv)                                                        |
-| Bônus: análise de complexidade   | Aba **Complexidade**: experimento com V = 10, 20, 40 e 80.                                                                     | [complexidade.csv](reports/complexidade.csv)                                                                |
+| Bônus: análise de complexidade   | Aba **Complexidade**: experimento com V de 10 a 320, dobrando a cada passo.                                                    | [complexidade.csv](reports/complexidade.csv)                                                                |
 
 Os arquivos de `reports/` são gerados por `scripts/generate_evidence.py` e `scripts/evaluate_datasets.py`. O [relatório de validação](docs/VALIDACAO.md) registra a execução completa desses passos.
 
@@ -161,7 +161,7 @@ Tempo no pior caso: **O(V³)**. Matrizes: **O(V²)** de memória. A implementaç
 
 O baseline roda Bellman-Ford do NetworkX para cada origem, aceitando pesos negativos. Seu limite teórico é O(V²E), com O(V²) para guardar a saída completa. A comparação verifica distâncias, pois caminhos diferentes podem ter o mesmo custo.
 
-O experimento usa grafos dirigidos completos com pesos positivos determinísticos, V = 10, 20, 40, 80, aquecimento e mediana de três execuções. A coluna `ms_per_n3` ajuda a observar a escala. O experimento não prova a complexidade e não demonstra que um algoritmo é sempre mais rápido.
+O experimento usa grafos dirigidos completos com pesos positivos determinísticos, V = 10, 20, 40, 80, 160, 320, aquecimento e mediana de três execuções. A coluna `ms_per_n3` ajuda a observar a escala; `time_ratio` divide a mediana pela da linha anterior (tende a 8 quando V dobra sob c·V³) e `loglog_slope` é log(t₂/t₁) / log(V₂/V₁), o expoente estimado entre linhas vizinhas (tende a 3). O experimento verifica a implementação, não prova a complexidade e não demonstra que um algoritmo é sempre mais rápido.
 
 Referências: [Floyd-Warshall e suas complexidades (NetworkX)](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.shortest_paths.dense.floyd_warshall.html) e [implementação de caminhos ponderados e Bellman-Ford (NetworkX)](https://networkx.org/documentation/stable/_modules/networkx/algorithms/shortest_paths/weighted.html).
 
