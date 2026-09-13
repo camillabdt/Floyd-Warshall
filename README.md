@@ -37,7 +37,7 @@ O projeto foi desenvolvido para o seminário da disciplina de Teoria da Computa�
 
 ## Entregáveis
 
-**Relatório principal:** [reports/relatorio_final.html](reports/relatorio_final.html). É o relatório HTML gerado pela aplicação, com cartões de métricas, caminhos, comparação com o baseline e análise crítica da escolha do algoritmo. Abra no navegador para ler offline; a versão em JSON do mesmo relatório está em [relatorio_final.json](reports/relatorio_final.json).
+**Relatório principal:** [reports/relatorio_final.html](reports/relatorio_final.html). É o relatório HTML gerado pelo script de evidências, com a definição do problema (instância, entrada, saída, restrições e pertinência à classe P), o funcionamento do algoritmo (por que o laço de k é o mais externo e como o caminho é reconstruído), métricas, caminhos, comparação com o baseline nas redes maiores, experimento de complexidade e análise crítica da escolha. Abra no navegador para ler offline; a versão em JSON do mesmo relatório está em [relatorio_final.json](reports/relatorio_final.json).
 
 Cada funcionalidade esperada no seminário tem um lugar na aplicação e uma evidência gerada em [reports/](reports/).
 
