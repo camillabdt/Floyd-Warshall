@@ -9,10 +9,16 @@ def compare(graph, primary, baseline):
     first = EvaluationService(primary).evaluate(graph)
     second = EvaluationService(baseline).evaluate(graph)
     a, b = first.result, second.result
-    matches = all(isclose(a.distance(u, v), b.distance(u, v), rel_tol=1e-9, abs_tol=1e-9)
-                  for u in a.vertices for v in a.vertices)
-    return {"distances_match": matches, "floyd_warshall": asdict(first.metrics),
-            "bellman_ford": asdict(second.metrics)}
+    matches = all(
+        isclose(a.distance(u, v), b.distance(u, v), rel_tol=1e-9, abs_tol=1e-9)
+        for u in a.vertices
+        for v in a.vertices
+    )
+    return {
+        "distances_match": matches,
+        "floyd_warshall": asdict(first.metrics),
+        "bellman_ford": asdict(second.metrics),
+    }
 
 
 def benchmark(graph_factory, solver, sizes=(10, 20, 40, 80), repeats=3):
@@ -33,6 +39,13 @@ def benchmark(graph_factory, solver, sizes=(10, 20, 40, 80), repeats=3):
             solver.solve(graph)
             times.append((perf_counter() - start) * 1000)
         ms = median(times)
-        rows.append({"vertices": n, "edges": n*(n-1), "median_ms": ms,
-                     "ms_per_n3": ms / n**3, "repeats": repeats})
+        rows.append(
+            {
+                "vertices": n,
+                "edges": n * (n - 1),
+                "median_ms": ms,
+                "ms_per_n3": ms / n**3,
+                "repeats": repeats,
+            }
+        )
     return rows

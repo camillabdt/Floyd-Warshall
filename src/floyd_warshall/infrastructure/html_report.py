@@ -1,9 +1,9 @@
 """Relatório HTML autossuficiente, responsivo e preparado para impressão."""
+
 from html import escape
 from math import isfinite
 
-
-STYLE = '''
+STYLE = """
 :root{--ink:#172b3a;--muted:#526678;--blue:#153e58;--teal:#087f83;--line:#dae4e9;--paper:#fff}
 *{box-sizing:border-box}body{margin:0;background:#edf2f5;color:var(--ink);font:15px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
 main{max-width:1120px;margin:32px auto;background:var(--paper);box-shadow:0 16px 60px #17364d12}
@@ -25,67 +25,112 @@ summary{cursor:pointer;padding:15px 0;font-weight:650}details{margin-top:12px}.r
 footer{padding:22px 56px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}a{color:var(--teal)}
 @media(max-width:700px){main{margin:0}.body,header,footer{padding:26px 22px}.grid{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}}
 @media print{@page{size:A4;margin:15mm}body{background:white;font-size:11px}main{margin:0;max-width:none;box-shadow:none}header{padding:24px;color:#172b3a;background:#edf4f7}header p,.eyebrow{color:#365766}.body{padding:24px 0}footer{padding:15px 0}h1{font-size:32px}h2{font-size:19px}h2,h3,summary{break-after:avoid}.card,.panel,.callout,tr{break-inside:avoid}.value{font-size:23px}th,td{padding:7px}.scroll{overflow:visible}.matrix{font-size:8px}.matrix th,.matrix td{padding:4px}.screen{display:none}a{color:inherit}thead{display:table-header-group}}
-'''
+"""
 
 
 def fmt(value, digits=2):
     if value is None or not isfinite(value):
-        return '—'
-    return f'{value:,.{digits}f}'.replace(',', '_').replace('.', ',').replace('_', '.')
+        return "—"
+    return f"{value:,.{digits}f}".replace(",", "_").replace(".", ",").replace("_", ".")
 
 
-def table(headers, rows, cls=''):
-    head = ''.join(f'<th scope="col">{escape(str(x))}</th>' for x in headers)
-    body = ''.join('<tr>' + ''.join(f'<td>{escape(str(x))}</td>' for x in row) + '</tr>' for row in rows)
+def table(headers, rows, cls=""):
+    head = "".join(f'<th scope="col">{escape(str(x))}</th>' for x in headers)
+    body = "".join(
+        "<tr>" + "".join(f"<td>{escape(str(x))}</td>" for x in row) + "</tr>" for row in rows
+    )
     return f'<div class="scroll"><table class="{cls}"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
 def render_report(data):
-    m = data['metrics']
-    vertices = data['vertices']
+    m = data["metrics"]
+    vertices = data["vertices"]
     n = len(vertices)
-    reachable, unreachable = m['reachable_pairs'], m['unreachable_pairs']
+    reachable, unreachable = m["reachable_pairs"], m["unreachable_pairs"]
     total = reachable + unreachable
     percentage = 100 * reachable / total if total else 0
-    cards = [('Vértices', str(m['vertices']), 'pontos da rede'),
-             ('Arestas', str(m['edges']), 'conexões dirigidas'),
-             ('Tempo de execução', fmt(m['execution_time_ms'], 3), 'ms · sem instrumentação'),
-             ('Pico de memória Python', fmt(m['peak_memory_kb']), 'KiB · execução separada')]
-    metrics = ''.join(f'<div class="card"><div class="label">{label}</div><div class="value">{value}</div><div class="unit">{unit}</div></div>' for label,value,unit in cards)
-    overview = table(['Indicador', 'Resultado', 'Interpretação'], [
-        ['Densidade', fmt(m['density'])+'%', 'Conexões existentes entre vértices distintos.'],
-        ['Distância média', fmt(m['average_distance']), 'Média dos custos mínimos finitos; exclui a diagonal.'],
-        ['Menor / maior distância', fmt(m['minimum_distance'])+' / '+fmt(m['maximum_distance']), 'Extremos entre pares distintos alcançáveis.']])
-    comparison = data.get('comparison')
+    cards = [
+        ("Vértices", str(m["vertices"]), "pontos da rede"),
+        ("Arestas", str(m["edges"]), "conexões dirigidas"),
+        ("Tempo de execução", fmt(m["execution_time_ms"], 3), "ms · sem instrumentação"),
+        ("Pico de memória Python", fmt(m["peak_memory_kb"]), "KiB · execução separada"),
+    ]
+    metrics = "".join(
+        f'<div class="card"><div class="label">{label}</div><div class="value">{value}</div><div class="unit">{unit}</div></div>'
+        for label, value, unit in cards
+    )
+    overview = table(
+        ["Indicador", "Resultado", "Interpretação"],
+        [
+            ["Densidade", fmt(m["density"]) + "%", "Conexões existentes entre vértices distintos."],
+            [
+                "Distância média",
+                fmt(m["average_distance"]),
+                "Média dos custos mínimos finitos; exclui a diagonal.",
+            ],
+            [
+                "Menor / maior distância",
+                fmt(m["minimum_distance"]) + " / " + fmt(m["maximum_distance"]),
+                "Extremos entre pares distintos alcançáveis.",
+            ],
+        ],
+    )
+    comparison = data.get("comparison")
     if comparison:
-        matches = comparison['distances_match']
-        status = 'Todas as distâncias coincidem' if matches else 'Foram encontradas divergências'
+        matches = comparison["distances_match"]
+        status = "Todas as distâncias coincidem" if matches else "Foram encontradas divergências"
         comparison_html = f'<p><span class="badge {"" if matches else "fail"}">{status}</span></p>'
-        comparison_html += table(['Algoritmo', 'Tempo (ms)', 'Pico Python (KiB)'], [
-            ['Floyd-Warshall próprio', fmt(comparison['floyd_warshall']['execution_time_ms'],3),fmt(comparison['floyd_warshall']['peak_memory_kb'])],
-            ['Bellman-Ford por origem',fmt(comparison['bellman_ford']['execution_time_ms'],3),fmt(comparison['bellman_ford']['peak_memory_kb'])]])
+        comparison_html += table(
+            ["Algoritmo", "Tempo (ms)", "Pico Python (KiB)"],
+            [
+                [
+                    "Floyd-Warshall próprio",
+                    fmt(comparison["floyd_warshall"]["execution_time_ms"], 3),
+                    fmt(comparison["floyd_warshall"]["peak_memory_kb"]),
+                ],
+                [
+                    "Bellman-Ford por origem",
+                    fmt(comparison["bellman_ford"]["execution_time_ms"], 3),
+                    fmt(comparison["bellman_ford"]["peak_memory_kb"]),
+                ],
+            ],
+        )
         comparison_html += '<p class="note">Medições pontuais da comparação, distintas da execução principal acima. Incluem a preparação interna de cada solver. Não demonstram superioridade estatística ou universal. A verificação usa tolerância de 1e-9; caminhos diferentes podem ter o mesmo custo.</p>'
     else:
         comparison_html = '<div class="callout">Comparação não executada nesta análise. Na aplicação, execute “Comparar com baseline” antes de exportar para incluir os resultados.</div>'
     # Resumo legível; todos os pares continuam disponíveis no apêndice HTML.
-    index = {v:i for i,v in enumerate(vertices)}
+    index = {v: i for i, v in enumerate(vertices)}
     path_rows = []
-    for item in data['paths']:
-        u,v,path = item['source'],item['target'],item['path']
-        distance = data['distances'][index[u]][index[v]]
-        path_rows.append([u,v,fmt(distance),' → '.join(path) if path else 'Sem caminho'])
-    sample = [row for row in path_rows if row[0] != row[1] and row[3] != 'Sem caminho'][:8]
-    path_summary = table(['Origem','Destino','Custo mínimo','Caminho'], sample) if sample else '<p>Nenhum par de vértices distintos possui caminho.</p>'
-    all_paths = table(['Origem','Destino','Custo mínimo','Caminho'],path_rows)
+    for item in data["paths"]:
+        u, v, path = item["source"], item["target"], item["path"]
+        distance = data["distances"][index[u]][index[v]]
+        path_rows.append([u, v, fmt(distance), " → ".join(path) if path else "Sem caminho"])
+    sample = [row for row in path_rows if row[0] != row[1] and row[3] != "Sem caminho"][:8]
+    path_summary = (
+        table(["Origem", "Destino", "Custo mínimo", "Caminho"], sample)
+        if sample
+        else "<p>Nenhum par de vértices distintos possui caminho.</p>"
+    )
+    all_paths = table(["Origem", "Destino", "Custo mínimo", "Caminho"], path_rows)
     # Matriz prévia evita tabelas de 100 colunas no corpo principal.
     limit = min(n, 12)
-    matrix_rows = [[vertices[i]]+[fmt(x) for x in data['distances'][i][:limit]] for i in range(limit)]
-    matrix = table(['Origem / destino']+vertices[:limit],matrix_rows,'matrix')
-    matrix_note = ('Prévia dos primeiros 12 vértices. A tabela completa de pares abaixo abrange todos os vértices.' if n > 12 else 'Matriz completa. A diagonal representa custo zero; “—” indica ausência de caminho.')
-    edges = table(['Origem','Destino','Peso'],[[u,v,fmt(w)] for u,v,w in data['edges']])
-    negative = any(w < 0 for _,_,w in data['edges'])
-    weight_note = ('Este dataset contém pesos negativos, um requisito que o Dijkstra convencional não atende.' if negative else 'Este dataset não contém pesos negativos: Dijkstra também é uma alternativa válida a avaliar.')
-    return f'''<!doctype html>
+    matrix_rows = [
+        [vertices[i]] + [fmt(x) for x in data["distances"][i][:limit]] for i in range(limit)
+    ]
+    matrix = table(["Origem / destino"] + vertices[:limit], matrix_rows, "matrix")
+    matrix_note = (
+        "Prévia dos primeiros 12 vértices. A tabela completa de pares abaixo abrange todos os vértices."
+        if n > 12
+        else "Matriz completa. A diagonal representa custo zero; “—” indica ausência de caminho."
+    )
+    edges = table(["Origem", "Destino", "Peso"], [[u, v, fmt(w)] for u, v, w in data["edges"]])
+    negative = any(w < 0 for _, _, w in data["edges"])
+    weight_note = (
+        "Este dataset contém pesos negativos, um requisito que o Dijkstra convencional não atende."
+        if negative
+        else "Este dataset não contém pesos negativos: Dijkstra também é uma alternativa válida a avaliar."
+    )
+    return f"""<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Relatório • {escape(str(data['dataset']))} • Floyd-Warshall</title><style>{STYLE}</style></head>
 <body><main><header><div class="eyebrow">Laboratório de grafos · relatório de análise</div>
@@ -110,4 +155,4 @@ def render_report(data):
 <p>O algoritmo aplica d[i,j] = min(d[i,j], d[i,k] + d[k,j]), permitindo novos intermediários a cada rodada. A densidade exclui laços. Média e extremos consideram somente pares distintos com distância finita.</p>
 <details><summary>Dados de entrada · {len(data['edges'])} arestas</summary>{edges}</details>
 <p class="note">Referências: <a href="https://networkx.org/documentation/stable/reference/algorithms/shortest_paths.html">NetworkX · caminhos mínimos</a> e <a href="https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.shortest_paths.dense.floyd_warshall.html">Floyd-Warshall e complexidade</a>.</p></section>
-</div><footer>Floyd-Warshall · Projeto acadêmico<br>Relatório autossuficiente: leitura sem internet. Resultados referentes ao dataset indicado; medições podem variar entre execuções.</footer></main></body></html>'''
+</div><footer>Floyd-Warshall · Projeto acadêmico<br>Relatório autossuficiente: leitura sem internet. Resultados referentes ao dataset indicado; medições podem variar entre execuções.</footer></main></body></html>"""

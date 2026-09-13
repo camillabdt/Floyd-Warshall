@@ -1,4 +1,5 @@
 """Baseline independente: Bellman-Ford do NetworkX a partir de cada origem."""
+
 from math import inf
 import networkx as nx
 from floyd_warshall.application.shortest_path_solver import ShortestPathSolver

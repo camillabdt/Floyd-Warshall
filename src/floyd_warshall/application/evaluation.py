@@ -49,13 +49,9 @@ class EvaluationService:
         graph: Graph,
     ) -> EvaluationResult:
 
-        number_of_vertices = len(
-            graph.vertices()
-        )
+        number_of_vertices = len(graph.vertices())
 
-        number_of_edges = len(
-            list(graph.edges())
-        )
+        number_of_edges = len(list(graph.edges()))
 
         # Tempo sem instrumentação; memória em uma segunda execução.
         start = perf_counter()
@@ -75,13 +71,7 @@ class EvaluationService:
         if number_of_vertices > 1:
             density = (
                 sum(u != v for u, v, _ in graph.edges())
-                / (
-                    number_of_vertices
-                    * (
-                        number_of_vertices
-                        - 1
-                    )
-                )
+                / (number_of_vertices * (number_of_vertices - 1))
             ) * 100
         else:
             density = 0.0
@@ -91,44 +81,29 @@ class EvaluationService:
         reachable_pairs = 0
         unreachable_pairs = 0
 
-        for i in range(
-            number_of_vertices
-        ):
-            for j in range(
-                number_of_vertices
-            ):
+        for i in range(number_of_vertices):
+            for j in range(number_of_vertices):
 
                 # Não contamos o caminho
                 # do vértice para ele mesmo.
                 if i == j:
                     continue
 
-                distance = (
-                    result.distances[i][j]
-                )
+                distance = result.distances[i][j]
 
                 if distance == inf:
                     unreachable_pairs += 1
                 else:
                     reachable_pairs += 1
-                    finite_distances.append(
-                        distance
-                    )
+                    finite_distances.append(distance)
 
         if finite_distances:
 
-            average_distance = (
-                sum(finite_distances)
-                / len(finite_distances)
-            )
+            average_distance = sum(finite_distances) / len(finite_distances)
 
-            minimum_distance = min(
-                finite_distances
-            )
+            minimum_distance = min(finite_distances)
 
-            maximum_distance = max(
-                finite_distances
-            )
+            maximum_distance = max(finite_distances)
 
         else:
 
@@ -141,9 +116,7 @@ class EvaluationService:
             edges=number_of_edges,
             density=density,
             execution_time_ms=execution_time_ms,
-            peak_memory_kb=(
-                peak_memory / 1024
-            ),
+            peak_memory_kb=(peak_memory / 1024),
             reachable_pairs=reachable_pairs,
             unreachable_pairs=unreachable_pairs,
             average_distance=average_distance,

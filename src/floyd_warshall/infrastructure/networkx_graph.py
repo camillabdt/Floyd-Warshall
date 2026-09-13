@@ -49,6 +49,5 @@ class NetworkXGraph(Graph):
                 str(destination),
                 float(data["weight"]),
             )
-            for origin, destination, data
-            in self._graph.edges(data=True)
+            for origin, destination, data in self._graph.edges(data=True)
         ]

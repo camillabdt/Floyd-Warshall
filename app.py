@@ -27,7 +27,9 @@ def run():
         selected = st.selectbox("Dataset salvo", ["Selecione..."] + saved)
         uploaded = st.file_uploader("Ou envie um CSV/JSON", type=["csv", "json"])
         save = st.button("Salvar upload")
-        st.caption("CSV: source,target,weight. JSON aceita vertices e edges, incluindo vértices isolados.")
+        st.caption(
+            "CSV: source,target,weight. JSON aceita vertices e edges, incluindo vértices isolados."
+        )
     try:
         if uploaded is not None:
             label, content = uploaded.name, uploaded.getvalue()
@@ -63,14 +65,18 @@ def run():
         st.write("Vértices:", graph.vertices())
         st.dataframe(pd.DataFrame(graph.edges(), columns=["source", "target", "weight"]))
     if len(graph.vertices()) > 200:
-        st.warning("Esta interface aceita até 200 vértices por análise. Use a biblioteca para estudos maiores.")
+        st.warning(
+            "Esta interface aceita até 200 vértices por análise. Use a biblioteca para estudos maiores."
+        )
         return
     if st.button("Executar análise", type="primary"):
         st.session_state.pop("evaluation", None)
         st.session_state.pop("comparison", None)
         try:
             with st.spinner("Calculando caminhos mínimos..."):
-                st.session_state.evaluation = EvaluationService(FloydWarshallSolver()).evaluate(graph)
+                st.session_state.evaluation = EvaluationService(FloydWarshallSolver()).evaluate(
+                    graph
+                )
         except NegativeCycleError as exc:
             st.error(str(exc))
             return
@@ -80,11 +86,13 @@ def run():
         return
     evaluation = st.session_state.evaluation
     result = evaluation.result
-    tabs = st.tabs(["Caminhos e grafo", "Métricas e matrizes", "Baseline", "Complexidade", "Relatórios"])
+    tabs = st.tabs(
+        ["Caminhos e grafo", "Métricas e matrizes", "Baseline", "Complexidade", "Relatórios"]
+    )
     with tabs[0]:
         cols = st.columns(2)
         origin = cols[0].selectbox("Origem", result.vertices)
-        destination = cols[1].selectbox("Destino", result.vertices, index=len(result.vertices)-1)
+        destination = cols[1].selectbox("Destino", result.vertices, index=len(result.vertices) - 1)
         path = result.path(origin, destination)
         if path is None:
             st.warning(f"Não existe caminho de {origin} para {destination}.")
@@ -94,7 +102,9 @@ def run():
         if len(result.vertices) <= 50:
             st.plotly_chart(PlotlyGraphVisualizer().create(graph, highlighted_path=path))
         else:
-            st.info("Para redes acima de 50 vértices, o desenho mostra apenas o caminho consultado. Matrizes e relatórios abrangem a rede completa.")
+            st.info(
+                "Para redes acima de 50 vértices, o desenho mostra apenas o caminho consultado. Matrizes e relatórios abrangem a rede completa."
+            )
             if path:
                 route_graph = NetworkXGraph()
                 for vertex in path:
@@ -105,12 +115,25 @@ def run():
                 st.plotly_chart(PlotlyGraphVisualizer().create(route_graph, highlighted_path=path))
     with tabs[1]:
         st.dataframe(pd.DataFrame([asdict(evaluation.metrics)]))
-        st.caption("Tempo em ms sem instrumentação. Pico em KiB de alocações Python, medido em outra execução; não é memória total do processo. Pares e densidade excluem a diagonal.")
-        for title, matrix in [("Matriz inicial", result.initial_distances), ("Menores distâncias", result.distances)]:
+        st.caption(
+            "Tempo em ms sem instrumentação. Pico em KiB de alocações Python, medido em outra execução; não é memória total do processo. Pares e densidade excluem a diagonal."
+        )
+        for title, matrix in [
+            ("Matriz inicial", result.initial_distances),
+            ("Menores distâncias", result.distances),
+        ]:
             st.subheader(title)
-            st.dataframe(pd.DataFrame([["∞" if v == inf else str(v) for v in row] for row in matrix], index=result.vertices, columns=result.vertices))
+            st.dataframe(
+                pd.DataFrame(
+                    [["∞" if v == inf else str(v) for v in row] for row in matrix],
+                    index=result.vertices,
+                    columns=result.vertices,
+                )
+            )
     with tabs[2]:
-        st.write("Baseline: Bellman-Ford do NetworkX executado para cada origem. Aceita pesos negativos e compara todas as distâncias com tolerância de 1e-9.")
+        st.write(
+            "Baseline: Bellman-Ford do NetworkX executado para cada origem. Aceita pesos negativos e compara todas as distâncias com tolerância de 1e-9."
+        )
         if st.button("Comparar com baseline"):
             st.session_state.comparison = compare(graph, FloydWarshallSolver(), BellmanFordSolver())
         comparison = st.session_state.get("comparison")
@@ -119,24 +142,42 @@ def run():
                 st.success("Todas as distâncias coincidem com o baseline.")
             else:
                 st.error("Foram encontradas divergências nas distâncias.")
-            st.dataframe(pd.DataFrame({k: comparison[k] for k in ("floyd_warshall", "bellman_ford")}))
+            st.dataframe(
+                pd.DataFrame({k: comparison[k] for k in ("floyd_warshall", "bellman_ford")})
+            )
             st.caption("Medição pontual: não permite concluir superioridade geral de desempenho.")
     with tabs[3]:
-        st.markdown("**Floyd-Warshall:** tempo O(V³), espaço O(V²). A recorrência é d[i,j] = min(d[i,j], d[i,k] + d[k,j]). A ordem externa de k é essencial.\n\n**Bellman-Ford para todas as origens:** O(V²E), com O(V²) para armazenar o resultado completo.")
-        st.write("Experimento: grafos completos de 10, 20, 40 e 80 vértices; pesos positivos determinísticos, aquecimento e mediana de três execuções. O experimento ilustra crescimento, sem provar a complexidade.")
+        st.markdown(
+            "**Floyd-Warshall:** tempo O(V³), espaço O(V²). A recorrência é d[i,j] = min(d[i,j], d[i,k] + d[k,j]). A ordem externa de k é essencial.\n\n**Bellman-Ford para todas as origens:** O(V²E), com O(V²) para armazenar o resultado completo."
+        )
+        st.write(
+            "Experimento: grafos completos de 10, 20, 40 e 80 vértices; pesos positivos determinísticos, aquecimento e mediana de três execuções. O experimento ilustra crescimento, sem provar a complexidade."
+        )
         if st.button("Executar experimento de complexidade"):
             st.session_state.benchmark = benchmark(NetworkXGraph, FloydWarshallSolver())
         if "benchmark" in st.session_state:
             frame = pd.DataFrame(st.session_state.benchmark)
             st.dataframe(frame)
             st.line_chart(frame.set_index("vertices")[["median_ms"]])
-            st.download_button("Baixar experimento CSV", frame.to_csv(index=False), "complexidade.csv", "text/csv")
+            st.download_button(
+                "Baixar experimento CSV", frame.to_csv(index=False), "complexidade.csv", "text/csv"
+            )
     with tabs[4]:
         exporter = ReportExporter()
         comparison = st.session_state.get("comparison")
-        st.download_button("Baixar JSON", exporter.to_json(label, graph, evaluation, comparison), "relatorio.json", "application/json")
+        st.download_button(
+            "Baixar JSON",
+            exporter.to_json(label, graph, evaluation, comparison),
+            "relatorio.json",
+            "application/json",
+        )
         st.download_button("Baixar CSV", exporter.to_csv(evaluation), "caminhos.csv", "text/csv")
-        st.download_button("Baixar HTML", exporter.to_html(label, graph, evaluation, comparison), "relatorio.html", "text/html")
+        st.download_button(
+            "Baixar HTML",
+            exporter.to_html(label, graph, evaluation, comparison),
+            "relatorio.html",
+            "text/html",
+        )
 
 
 if __name__ == "__main__":
