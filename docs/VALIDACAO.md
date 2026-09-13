@@ -6,7 +6,7 @@ Validação realizada em 13/09/2026 com Python 3.12, Poetry 1.8.2 e as versões 
 
 - Instalação limpa: `poetry install --no-interaction`, concluída com o lock existente e instalação do projeto.
 - Consistência de dependências: `poetry check --lock`, resultado `All set!`.
-- Testes: `poetry run pytest -q`, **48 aprovados em 12,59 segundos** na execução registrada. O tempo varia entre execuções.
+- Testes: `poetry run pytest -q`, **51 aprovados em 6,56 segundos** na execução registrada. O tempo varia entre execuções.
 - Distribuição: `poetry build`, wheel e sdist gerados.
 - Relatórios JSON, CSV e HTML e grafo HTML autossuficiente gerados pelo script de evidências.
 - Servidor Streamlit iniciado localmente; a tela carregou 100 vértices e 430 arestas e exibiu distância 57 para P001 → P100. A prévia perdeu conexão após encerramento do servidor; não foi concluída a inspeção visual do grafo maior. O fluxo e a figura foram verificados pelos testes automatizados.
