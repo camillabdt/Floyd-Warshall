@@ -52,7 +52,7 @@ Mostre `pyproject.toml` e `poetry.lock`: dependências declaradas e resolução 
 
 ## Se a demonstração falhar
 
-Use `reports/relatorio_exemplo.html` para mostrar a saída calculada. Pelo terminal, execute `poetry run floyd-warshall datasets/grafo_exemplo.csv --origem A --destino D`. Não improvise resultados de tempo: apresente apenas os medidos e registrados.
+Use `reports/relatorio_final.html` para mostrar a saída calculada. Pelo terminal, execute `poetry run floyd-warshall datasets/grafo_exemplo.csv --origem A --destino D`. Não improvise resultados de tempo: apresente apenas os medidos e registrados.
 
 ## Ampliação da demonstração com as redes maiores
 

@@ -27,10 +27,10 @@ def main():
     if e.result.distance("A", "D") != 6:
         raise RuntimeError("Distância A -> D deveria ser 6 em grafo_exemplo.csv.")
     exporter = ReportExporter()
-    (reports / "relatorio_exemplo.json").write_text(
+    (reports / "relatorio_final.json").write_text(
         exporter.to_json("grafo_exemplo.csv", g, e, comparison)
     )
-    (reports / "relatorio_exemplo.html").write_text(
+    (reports / "relatorio_final.html").write_text(
         exporter.to_html("grafo_exemplo.csv", g, e, comparison)
     )
     (reports / "caminhos_exemplo.csv").write_text(exporter.to_csv(e))
