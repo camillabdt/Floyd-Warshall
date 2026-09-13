@@ -6,3 +6,6 @@ run:
 
 test:
 	poetry run pytest
+
+app:
+	poetry run streamlit run app.py
