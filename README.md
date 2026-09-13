@@ -89,12 +89,11 @@ poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D
 
 ## Simulação do algoritmo
 
+Gravação da execução passo a passo sobre `grafo_exemplo.csv`, com o grafo, a matriz de distâncias e a linha do algoritmo em execução lado a lado.
+
 [funcionamento-algoritmo.webm](https://github.com/user-attachments/assets/7e4991b9-5ee2-4351-8404-4b232d0140c1)
 
-
-<!-- Para o player aparecer aqui, arraste docs/funcionamento-algoritmo.webm no editor do README no GitHub e substitua o link abaixo pelo endereço gerado. -->
-
-[![Simulação do Floyd-Warshall (vídeo, 2,8 MB)](https://img.shields.io/badge/%E2%96%B6%20assistir-simula%C3%A7%C3%A3o%20do%20algoritmo-153e58?style=for-the-badge)](docs/funcionamento-algoritmo.webm)
+Para conduzir a simulação você mesmo, abra `study/simulacao.html` no navegador: dá para escolher o grafo, ajustar a velocidade e andar um passo por vez. O arquivo do vídeo está em [docs/funcionamento-algoritmo.webm](docs/funcionamento-algoritmo.webm).
 
 ## Demonstração rápida
 
@@ -218,6 +217,7 @@ O ZIP de entrega contém aplicativo, datasets, código, testes, documentação, 
 - [Justificativa da escolha do algoritmo](docs/JUSTIFICATIVA_ESCOLHA.md)
 - [Catálogo de datasets e método de geração](docs/DATASETS.md)
 - [Relatório de validação da entrega](docs/VALIDACAO.md)
+- Material de estudo em `study/`: abra `study/index.html` no navegador para o caderno com animações do algoritmo, ou `study/simulacao.html` para a simulação passo a passo
 
 ## Autoras
 
