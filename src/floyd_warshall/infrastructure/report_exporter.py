@@ -35,13 +35,17 @@ class ReportExporter:
             ],
         }
 
+    def dumps(self, payload):
+        """Serializa um payload, inclusive com seções opcionais adicionadas."""
+        return json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False)
+
+    def render(self, payload):
+        from floyd_warshall.infrastructure.html_report import render_report
+
+        return render_report(payload)
+
     def to_json(self, label, graph, evaluation, comparison=None):
-        return json.dumps(
-            self.payload(label, graph, evaluation, comparison),
-            ensure_ascii=False,
-            indent=2,
-            allow_nan=False,
-        )
+        return self.dumps(self.payload(label, graph, evaluation, comparison))
 
     def to_csv(self, evaluation):
         output = StringIO()
@@ -62,6 +66,4 @@ class ReportExporter:
         return output.getvalue()
 
     def to_html(self, label, graph, evaluation, comparison=None):
-        from floyd_warshall.infrastructure.html_report import render_report
-
-        return render_report(self.payload(label, graph, evaluation, comparison))
+        return self.render(self.payload(label, graph, evaluation, comparison))
