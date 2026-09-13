@@ -89,7 +89,8 @@ poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D
 
 ## Simulação do algoritmo
 
-O vídeo em [docs/funcionamento-algoritmo.webm](docs/funcionamento-algoritmo.webm) é uma simulação do funcionamento do algoritmo Floyd-Warshall.
+[funcionamento-algoritmo.webm](https://github.com/user-attachments/assets/7e4991b9-5ee2-4351-8404-4b232d0140c1)
+
 
 <!-- Para o player aparecer aqui, arraste docs/funcionamento-algoritmo.webm no editor do README no GitHub e substitua o link abaixo pelo endereço gerado. -->
 
