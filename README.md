@@ -53,13 +53,26 @@ Os arquivos de `reports/` são gerados por `scripts/generate_evidence.py` e `scr
 
 ## Tecnologias
 
-| Parte              | Tecnologias                         | Uso no projeto                                                                                                                                     |
-| ------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Algoritmo          | **Python 3.11+**                    | Implementação própria do Floyd-Warshall, avaliação, comparação e experimento de complexidade. Código em [src/floyd_warshall](src/floyd_warshall/). |
-| Grafos             | **NetworkX 3.6**                    | Representação do grafo, layout do desenho e baseline Bellman-Ford.                                                                                 |
-| Interface          | **Streamlit 1.63** e **Plotly 7.0** | Aplicação web em [app.py](app.py), desenho interativo do grafo e do caminho consultado.                                                            |
-| Dados e relatórios | **pandas 3.0** e **python-dotenv**  | Tabelas de métricas, exportação CSV e leitura da configuração em `.env`.                                                                           |
-| Ambiente e testes  | **Poetry 1.8+** e **pytest 8.3**    | Dependências fixadas em [poetry.lock](poetry.lock) e testes em [tests/](tests/).                                                                   |
+| Parte        | Tecnologia     | Uso no projeto                                                      |
+| ------------ | -------------- | ------------------------------------------------------------------- |
+| Algoritmo    | Python 3.11+   | Floyd-Warshall próprio em [src/floyd_warshall](src/floyd_warshall/) |
+| Grafos       | NetworkX 3.6   | Representação, layout e baseline Bellman-Ford                       |
+| Interface    | Streamlit 1.63 | Aplicação web em [app.py](app.py)                                   |
+| Visualização | Plotly 7.0     | Desenho interativo do grafo e do caminho                            |
+| Dados        | pandas 3.0     | Tabelas de métricas e exportação CSV                                |
+| Configuração | python-dotenv  | Leitura opcional de `.env`                                          |
+| Ambiente     | Poetry 1.8+    | Dependências fixadas em [poetry.lock](poetry.lock)                  |
+| Testes       | pytest 8.3     | Suíte em [tests/](tests/)                                           |
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&amp;logo=python&amp;logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/NetworkX-2C2D72?style=for-the-badge" alt="NetworkX">
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&amp;logo=streamlit&amp;logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&amp;logo=plotly&amp;logoColor=white" alt="Plotly">
+  <img src="https://img.shields.io/badge/pandas-150458?style=for-the-badge&amp;logo=pandas&amp;logoColor=white" alt="pandas">
+  <img src="https://img.shields.io/badge/Poetry-60A5FA?style=for-the-badge&amp;logo=poetry&amp;logoColor=white" alt="Poetry">
+  <img src="https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&amp;logo=pytest&amp;logoColor=white" alt="pytest">
+</p>
 
 ## Executar
 
