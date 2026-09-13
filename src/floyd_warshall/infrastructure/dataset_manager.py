@@ -117,7 +117,8 @@ class DatasetManager:
 
         try:
             dataframe = pd.read_csv(BytesIO(content), dtype=str, keep_default_na=False)
-        except Exception as exc:
+        except ValueError as exc:
+            # ParserError, EmptyDataError e UnicodeDecodeError derivam de ValueError.
             raise ValueError("Não foi possível ler o arquivo CSV.") from exc
 
         required_columns = {
