@@ -10,6 +10,11 @@ from math import isfinite
 ALGORITHM_RATIONALE = "Floyd-Warshall foi escolhido por calcular todos os pares, permitir matrizes e consultas reutilizáveis e oferecer uma implementação didática com pesos negativos. É adequado à escala demonstrada, mas não é universalmente superior: tempo O(V³) e espaço O(V²) limitam redes grandes. Para poucas origens e pesos não negativos, Dijkstra pode ser mais adequado; para todos os pares em redes esparsas, Johnson merece avaliação. As redes maiores deste projeto são esparsas e positivas. A concordância com Bellman-Ford apoia a correção dos casos testados, mas medições pontuais não demonstram superioridade geral, e Dijkstra e Johnson não foram medidos."
 
 
+def _spreadsheet_safe(text):
+    """Prefixo evita interpretação de rótulos como fórmulas em planilhas."""
+    return "'" + text if text.startswith(("=", "+", "-", "@")) else text
+
+
 class ReportExporter:
     def payload(self, label, graph, evaluation, comparison=None):
         result = evaluation.result
@@ -45,15 +50,13 @@ class ReportExporter:
         r = evaluation.result
         for u in r.vertices:
             for v in r.vertices:
-                # Prefixo evita interpretação de rótulos como fórmulas em planilhas.
-                safe = lambda s: "'" + s if s.startswith(("=", "+", "-", "@")) else s
                 distance = r.distance(u, v)
                 writer.writerow(
                     [
-                        safe(u),
-                        safe(v),
+                        _spreadsheet_safe(u),
+                        _spreadsheet_safe(v),
                         distance if isfinite(distance) else "",
-                        safe(" → ".join(r.path(u, v) or [])),
+                        _spreadsheet_safe(" → ".join(r.path(u, v) or [])),
                     ]
                 )
         return output.getvalue()
