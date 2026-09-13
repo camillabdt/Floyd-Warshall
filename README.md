@@ -122,3 +122,7 @@ O ZIP de entrega contém aplicativo, datasets, código, testes, documentação, 
 ## Por que escolhemos este algoritmo?
 
 Leia a [justificativa, vantagens, limitações e comparação com alternativas](docs/JUSTIFICATIVA_ESCOLHA.md). Os relatórios HTML e JSON exportados também incluem um resumo dessa análise.
+
+## Relatório HTML de apresentação
+
+A exportação HTML inclui cartões de métricas, resumo de alcançabilidade, caminhos, comparação com o baseline e análise crítica da escolha do algoritmo. Matrizes e tabelas completas ficam em seções expansíveis. Abra o HTML no navegador para ler offline ou use Imprimir → Salvar como PDF. Para incluir apêndices na impressão, expanda-os antes; redes grandes podem gerar muitas páginas.

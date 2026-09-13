@@ -124,3 +124,26 @@ def test_app_large_network_path_view():
     next(b for b in app.button if b.label == 'Executar análise').click().run()
     assert not app.exception
     assert app.session_state['evaluation'].result.path('P001','P060')
+
+
+def test_html_report_sections_and_missing_baseline():
+    g = NetworkXGraph()
+    g.add_vertex('A')
+    e = EvaluationService(FloydWarshallSolver()).evaluate(g)
+    html = ReportExporter().to_html('<img src=x onerror=alert(1)>',g,e)
+    assert '<img src=x' not in html
+    assert 'Comparação não executada' in html
+    assert 'Não há pares distintos' in html
+    assert 'Onde a escolha ajuda' in html
+    assert '@media print' in html
+
+
+def test_large_html_has_all_pairs_and_limited_matrix():
+    g = NetworkXGraph()
+    for i in range(14):
+        g.add_vertex(f'V{i}')
+    e = EvaluationService(FloydWarshallSolver()).evaluate(g)
+    html = ReportExporter().to_html('rede.json',g,e)
+    assert '196 pares' in html
+    assert 'Prévia dos primeiros 12' in html
+    assert '<td>V13</td>' in html

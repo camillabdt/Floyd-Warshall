@@ -41,10 +41,5 @@ class ReportExporter:
         return output.getvalue()
 
     def to_html(self, label, graph, evaluation, comparison=None):
-        content = escape(self.to_json(label, graph, evaluation, comparison))
-        return ('<!doctype html><html lang="pt-BR"><meta charset="utf-8">'
-                '<title>Relatório Floyd-Warshall</title><style>body{font:16px system-ui;'
-                'max-width:1000px;margin:40px auto;padding:20px}pre{white-space:pre-wrap}</style>'
-                '<h1>Relatório Floyd-Warshall</h1><p>Distâncias ausentes: null. '
-                'Tempo sem instrumentação; pico de alocações Python em execução separada.</p>'
-                '<h2>Justificativa da escolha e limitações</h2><p>' + escape(ALGORITHM_RATIONALE) + '</p><h2>Dados da análise</h2><pre>' + content + '</pre></html>')
+        from floyd_warshall.infrastructure.html_report import render_report
+        return render_report(self.payload(label, graph, evaluation, comparison))
