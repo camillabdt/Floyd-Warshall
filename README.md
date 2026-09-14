@@ -214,6 +214,7 @@ O ZIP de entrega contém aplicativo, datasets, código, testes, documentação, 
 
 - [Enunciado do seminário](docs/ENUNCIADO.md)
 - [Roteiro do seminário](docs/ROTEIRO_SEMINARIO.md)
+- [Slides da apresentação](docs/apresentacao.pdf)
 - [Justificativa da escolha do algoritmo](docs/JUSTIFICATIVA_ESCOLHA.md)
 - [Catálogo de datasets e método de geração](docs/DATASETS.md)
 - [Relatório de validação da entrega](docs/VALIDACAO.md)
