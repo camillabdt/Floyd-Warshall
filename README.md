@@ -21,7 +21,7 @@
   <a href="reports/relatorio_final.html">Relatório</a> ·
   <a href="#entregáveis">Entregáveis</a> ·
   <a href="#tecnologias">Tecnologias</a> ·
-  <a href="#executar">Como executar</a> ·
+  <a href="#executar">Executar</a> ·
   <a href="#simulação-do-algoritmo">Simulação</a> ·
   <a href="#demonstração-rápida">Demonstração</a> ·
   <a href="#algoritmo-e-complexidade">Algoritmo</a> ·
@@ -51,7 +51,17 @@ Cada funcionalidade esperada no seminário tem um lugar na aplicação e uma evi
 | Bônus: comparação com baseline   | Aba **Baseline**: Bellman-Ford do NetworkX para cada origem.                                                                   | [comparacao_redes.csv](reports/comparacao_redes.csv)                                                        |
 | Bônus: análise de complexidade   | Aba **Complexidade**: experimento com V de 10 a 320, dobrando a cada passo.                                                    | [complexidade.csv](reports/complexidade.csv)                                                                |
 
-Os arquivos de `reports/` são gerados por `scripts/generate_evidence.py` e `scripts/evaluate_datasets.py`. O [relatório de validação](docs/VALIDACAO.md) registra a execução completa desses passos.
+Os arquivos de `reports/` não são escritos à mão: `make reports` regera todos eles a partir do código. A ordem importa, porque `generate_evidence.py` lê o `comparacao_redes.csv` produzido por `evaluate_datasets.py`:
+
+```
+scripts/generate_datasets.py  ->  datasets/*.json e *.csv (seeds fixas)
+scripts/evaluate_datasets.py  ->  reports/comparacao_redes.csv
+scripts/generate_evidence.py  ->  reports/ relatorio_final.html e .json,
+                                  complexidade.csv, ambiente.json,
+                                  caminhos_exemplo.csv, grafo_exemplo.html
+```
+
+Os dois últimos scripts abortam com `RuntimeError` se alguma distância divergir do baseline Bellman-Ford, então um relatório só chega a existir se os números conferirem. O [relatório de validação](docs/VALIDACAO.md) registra a execução completa desses passos.
 
 ## Tecnologias
 
@@ -68,24 +78,127 @@ Os arquivos de `reports/` são gerados por `scripts/generate_evidence.py` e `scr
 
 ## Executar
 
-Requisitos: Python 3.11 ou superior compatível com o lock e Poetry 1.8 ou superior. A validação desta entrega foi feita com Python 3.12 e Poetry 1.8.2. Execute os comandos na raiz do projeto:
+Todos os comandos rodam na raiz do projeto. Esta tabela é o caminho mínimo, do zero ao resultado:
 
-```sh
-poetry install
-poetry run pytest -q
-poetry run streamlit run app.py
-```
+| Objetivo                 | Comando                                                                       | Resultado esperado                                  |
+| ------------------------ | ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| 1. Instalar, uma vez só  | `poetry install`                                                              | `.venv` criado dentro do projeto                    |
+| 2. **Rodar o algoritmo** | `poetry run floyd-warshall datasets/grafo_exemplo.csv --origem A --destino D` | `Distância: 6` e `Caminho: A -> B -> C -> D`        |
+| 3. Conferir os testes    | `make test`                                                                   | `52 passed`                                         |
+| 4. Regerar os resultados | `make reports`                                                                | `datasets/` e `reports/` refeitos, em cerca de 20 s |
+| 5. Abrir a interface web | `make app`                                                                    | Streamlit no navegador                              |
 
-A instalação inicial precisa de acesso aos pacotes ou cache local. Depois de instaladas as dependências, a demonstração funciona sem internet. Não é necessário ativar manualmente o ambiente virtual, pois [poetry.toml](poetry.toml) configura o `.venv` dentro do projeto.
+Depois do passo 4, o relatório completo está em [reports/relatorio_final.html](reports/relatorio_final.html) e o desenho interativo do grafo em [reports/grafo_exemplo.html](reports/grafo_exemplo.html). A saída do passo 2 está explicada em [Rodar apenas o algoritmo](#rodar-apenas-o-algoritmo).
+
+Requisitos: Python 3.11 ou superior compatível com o lock e Poetry 1.8 ou superior. A validação desta entrega foi feita com Python 3.12 e Poetry 1.8.2. A instalação inicial precisa de acesso aos pacotes ou cache local; depois disso, a demonstração funciona sem internet. Não é necessário ativar manualmente o ambiente virtual, pois [poetry.toml](poetry.toml) configura o `.venv` dentro do projeto.
 
 Configuração opcional: copie `.env.example` para `.env`. Caminhos relativos são resolvidos a partir da pasta de execução. Os relatórios da interface são baixados pelo navegador; a variável `REPORTS_DIR` é usada apenas pelo script de geração de evidências.
 
-A biblioteca também pode ser usada pela linha de comando:
+### Atalhos com make
+
+O [Makefile](Makefile) reúne todos os comandos do projeto. `make` sozinho, ou `make help`, imprime a lista.
+
+| Alvo            | O que faz                                                                        |
+| --------------- | -------------------------------------------------------------------------------- |
+| `make install`  | Instala as dependências no `.venv` do projeto                                    |
+| `make test`     | Roda a suíte de testes (`pytest -q`)                                             |
+| `make run`      | Executa a CLI no grafo de exemplo, de A até D                                    |
+| `make app`      | Abre a interface Streamlit                                                       |
+| `make datasets` | Regera as redes sintéticas em `datasets/`, com as seeds fixas                    |
+| `make evaluate` | Compara as redes maiores com o baseline e escreve `reports/comparacao_redes.csv` |
+| `make evidence` | Gera relatórios, métricas e o gráfico interativo em `reports/`                   |
+| `make reports`  | Roda os três acima na ordem correta                                              |
+| `make check`    | `poetry check --lock` e a suíte de testes                                        |
+| `make package`  | `poetry build` e o ZIP de entrega com `MANIFEST.sha256`                          |
+| `make release`  | `check`, `reports` e `package`, na sequência                                     |
+| `make clean`    | Remove `__pycache__` e `.pytest_cache`                                           |
+
+Reprodutibilidade verificada: após `make reports`, os arquivos de `datasets/` voltam bit a bit idênticos, porque `generate_datasets.py` usa sementes fixas. Só os relatórios mudam, nos campos de tempo e data.
+
+### Rodar apenas o algoritmo
+
+Só o algoritmo: um arquivo de grafo entra, as matrizes e o caminho saem no terminal. Sem interface e sem relatórios.
 
 ```sh
 poetry run floyd-warshall datasets/grafo_exemplo.csv --origem A --destino D
-poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D
 ```
+
+Saída completa deste comando:
+
+```text
+Matriz inicial
+               A       B       D       C
+A              0       3      10     INF
+B            INF       0     INF       2
+D            INF     INF       0     INF
+C            INF     INF       1       0
+
+Matriz de menores distâncias
+               A       B       D       C
+A              0       3       6       5
+B            INF       0       3       2
+D            INF     INF       0     INF
+C            INF     INF       1       0
+
+Consulta A -> D
+Distância: 6
+Caminho: A -> B -> C -> D
+```
+
+Leitura da saída:
+
+- A **matriz inicial** é o grafo como veio do arquivo: `INF` marca um par sem aresta direta.
+- A **matriz de menores distâncias** é o resultado do algoritmo. A célula `A, D` caiu de 10 para 6, porque o desvio `A -> B -> C -> D` custa `3 + 2 + 1`.
+- As linhas de `D` continuam `INF` porque nenhuma aresta sai de `D`: o algoritmo não inventa caminho onde não existe.
+- A ordem das colunas segue a ordem em que os vértices aparecem no arquivo, não a alfabética.
+
+`--origem` e `--destino` são opcionais, mas andam juntos: sem eles a CLI imprime apenas as duas matrizes. Os três formatos de entrada funcionam no mesmo comando:
+
+```sh
+poetry run floyd-warshall examples/grafo_exemplo.txt --origem A --destino D
+poetry run floyd-warshall datasets/rede_logistica_30.json
+```
+
+`make run` é o atalho para o exemplo em TXT.
+
+### Pesos negativos e casos sem resposta
+
+Três comandos cobrem o que o algoritmo faz nos limites. O terceiro é o único que falha, e falha de propósito.
+
+```sh
+poetry run floyd-warshall datasets/grafo_peso_negativo.json --origem A --destino C
+poetry run floyd-warshall datasets/grafo_desconexo.json --origem A --destino Z
+poetry run floyd-warshall datasets/grafo_ciclo_negativo.json --origem A --destino C
+```
+
+| Grafo              | Saída esperada                                           | Por quê                                                                       |
+| ------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Com peso negativo  | `Distância: 2`, caminho `A -> B -> C`                    | Floyd-Warshall aceita aresta de peso negativo, ao contrário de Dijkstra       |
+| Desconexo          | `Não existe caminho entre os vértices.`                  | A distância fica `INF` e a consulta responde sem erro                         |
+| Com ciclo negativo | `Erro: Ciclo de peso negativo detectado envolvendo 'A'.` | Não existe caminho mínimo: dar mais uma volta no ciclo sempre sai mais barato |
+
+No terceiro caso a mensagem vai para o `stderr` e o processo termina com código de saída 1, então o erro é detectável em script.
+
+### Usar como biblioteca
+
+O mesmo algoritmo, chamado de dentro de um script Python, sem passar por arquivo:
+
+```python
+from floyd_warshall.application.floyd_warshall_solver import FloydWarshallSolver
+from floyd_warshall.infrastructure.networkx_graph import NetworkXGraph
+
+graph = NetworkXGraph()
+for origin, destination, weight in [("A", "B", 3), ("A", "D", 10), ("B", "C", 2), ("C", "D", 1)]:
+    graph.add_edge(origin, destination, weight)
+
+result = FloydWarshallSolver().solve(graph)
+
+print(result.distance("A", "D"))  # 6.0
+print(result.path("A", "D"))      # ['A', 'B', 'C', 'D']
+print(result.distance("D", "A"))  # inf
+```
+
+Rode com `poetry run python seu_script.py`. O solver recebe qualquer objeto que implemente o contrato `Graph`, então `NetworkXGraph` pode ser trocado sem alterar o algoritmo.
 
 ## Simulação do algoritmo
 
@@ -200,12 +313,22 @@ Poetry gerencia bibliotecas e ambiente; isso é distinto da injeção de depend�
 
 ## Verificar e empacotar
 
+Um comando cobre a entrega inteira:
+
+```sh
+make release
+```
+
+Ele equivale a esta sequência, que também pode ser rodada passo a passo:
+
 ```sh
 poetry check --lock
 poetry run pytest -q
-poetry run python scripts/generate_evidence.py
+poetry run python scripts/generate_datasets.py
 poetry run python scripts/evaluate_datasets.py
+poetry run python scripts/generate_evidence.py
 poetry build
+poetry run python scripts/package_release.py
 ```
 
 O ZIP de entrega contém aplicativo, datasets, código, testes, documentação, lock, relatórios de exemplo e distribuições Python. O wheel instala a biblioteca e a CLI; use o ZIP completo para a interface Streamlit, datasets e material do seminário. `.venv`, `.env`, caches e histórico Git não fazem parte da entrega.
